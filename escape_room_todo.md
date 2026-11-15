@@ -103,10 +103,21 @@ This is a **schema sketch**, not a valid sample complete level. In the real expo
 - [ ] Specify explicit entry/exit *polarity*: no two exits/ends can mate, and no two starts/entrances can mate when direction requires start-to-end matching.
 - [ ] Decide whether multi-cell stairs/slides are (a) atomic multi-cell prefabs with reserved footprint, or (b) segment tiles with continuity constraints. **For MVP, atomic prefabs are simpler**; segmented WFC is a stretch goal.
 
+#### Starting literature
+
+Read these in order; the first two establish the WFC/CSP baseline, and the later papers are extensions:
+
+1. Maxim Gumin, [WaveFunctionCollapse](https://github.com/mxgmn/WaveFunctionCollapse) (2016). Reference description of the observation/propagation loop and the simple tiled model.
+2. Isaac Karth and Adam M. Smith, [“WaveFunctionCollapse is constraint solving in the wild”](https://doi.org/10.1145/3102071.3110566) (2017). Useful framing of WFC as a constraint-satisfaction approach, including its limitations.
+3. Arunpreet Sandhu, Zeyuan Chen, and Joshua McCoy, [“Enhancing wave function collapse with design-level constraints”](https://doi.org/10.1145/3337722.3337752) (2019). Directly relevant to adding constraints beyond local tile adjacency.
+4. Bahar Bateni, Isaac Karth, and Adam Smith, [“Better Resemblance without Bigger Patterns: Making Context-sensitive Decisions in WFC”](https://doi.org/10.1145/3582437.3582441) (FDG 2023), with [code](https://github.com/iambb5445/Context-sensitive-WFC). This changes decision heuristics for better resemblance; it is not, by itself, a solution to global endpoint connectivity.
+
+For our first version, use a **simple tiled WFC solver with global constraints around it**: propagate six-direction local compatibility, then check endpoint pairing, directed connectivity, and reserved-volume collisions on a complete layout. Retry invalid layouts with a bounded limit. Only add global constraint propagation inside the solver if these checks prove too inefficient. In this sense “global-constrained WFC” describes our extension; it is not a separate standard WFC algorithm we need to find and adopt.
+
 ### A2. Implement basic WFC
 
-- [ ] Implement tile compatibility matrix for N/E/S/W/U/D.
-- [ ] Implement possible tile sets for each cell and constraint propagation.
+- [x] Implement tile compatibility table for N/E/S/W/U/D.
+- [x] Implement possible tile sets for each cell and local constraint propagation.
 - [ ] Choose next cell by minimum remaining possibilities (entropy heuristic; randomized tie breaks).
 - [ ] Implement contradiction handling: backtracking or reset with a bounded retry count.
 - [ ] Support seeded randomness and reproducible outputs.
