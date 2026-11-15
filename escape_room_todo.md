@@ -118,18 +118,19 @@ For our first version, use a **simple tiled WFC solver with global constraints a
 
 - [x] Implement tile compatibility table for N/E/S/W/U/D.
 - [x] Implement possible tile sets for each cell and local constraint propagation.
-- [ ] Choose next cell by minimum remaining possibilities (entropy heuristic; randomized tie breaks).
-- [ ] Implement contradiction handling: backtracking or reset with a bounded retry count.
-- [ ] Support seeded randomness and reproducible outputs.
-- [ ] Support **pre-collapsed cells** for mandatory slide/stair endpoints provided by the graph workstream.
+- [x] Choose next cell by minimum remaining possibilities (entropy heuristic; randomized tie breaks).
+- [x] Implement contradiction handling with bounded random restarts.
+- [x] Support seeded randomness and reproducible outputs.
+- [x] Support **pre-collapsed cells** for mandatory slide/stair endpoints provided by the graph workstream.
 - [ ] Write unit tests for tile rotation, port matching, contradictions, and pre-collapsed endpoints.
 
 ### A3. Global constraints and geometric validation
 
-- [ ] Enforce required endpoint pairs: every required connection has one legal start and one legal end.
-- [ ] Reject dangling ports, incompatible connection types, and endpoint polarity errors.
+- [x] Enforce required endpoint pairs with a whole-layout connectivity check over matching non-empty ports.
+- [x] Reject mismatched adjacent ports and optionally reject dangling ports at layout boundaries.
+- [ ] Enforce endpoint polarity errors and directed stair/slide traversal.
 - [ ] Track reserved volumes to reject intersecting stairs/slides; consider clearance above walking surfaces.
-- [ ] Ensure each mandated pair is connected by a continuous, directed route; connectivity cannot be guaranteed by local port matching alone.
+- [x] Ensure each mandated pair is connected by a continuous port route; directed stair/slide routing remains unimplemented.
 - [ ] Ensure realized physical traversals match allowed directed graph edges.
 - [ ] Verify start-to-exit reachability **after** WFC; regenerate or backtrack if invalid.
 - [ ] Export module placement and a realized movement graph as JSON.
