@@ -37,10 +37,10 @@ class Building(object):
                                            max_edges=self.max_edges)
         self.path = list(map(tuple, path.tolist()))
         
-        graph = self.draw_path(graph=graph, path=self.path)
+        self.graph = self.draw_path(graph=graph, path=self.path)
         self.display_graph(graph=graph)
         
-        self.graph = self.populate_graph(graph=graph, 
+        self.graph = self.populate_graph(graph=self.graph, 
                                          path=self.path, 
                                          non_solution_edges=self.non_solution_edges,
                                          p_intra_pop=self.p_intra_pop,
@@ -66,6 +66,33 @@ class Building(object):
         graph = nx.DiGraph(nx.create_empty_copy(graph))
         
         return graph
+
+    @staticmethod
+    def gaussian_weight(u: tuple[int], v: tuple[int], std: float = 1.0) -> float:
+        return np.exp(-1/2 * np.linalg.norm(u - v, axis = 1)**2 / std**2)
+    
+    def node_weight(self, target_nodes: list[tuple[int]], k: float = 1) -> float:
+        """Returns the weight for a source node given by 
+        the gamma function where the input is the shortest
+        path length from the closest node in the solution path
+        to the target node
+
+        Args:
+            target_nodes (list[tuple[int]]): list of target node(s)
+
+        Returns:
+            float: the weight(s)
+        """
+        # Run a shortest path algorithm
+        all_distances = []
+        for node in target_nodes:
+            distance, path = nx.multi_source_dijkstra(self.graph, self.path, node, weight = "weight")
+            all_distances.append(distance)
+        all_distances = np.asarray(all_distances)
+        
+        # Compute weights by the gamma function # TODO: Reconsider weight function choice (not the real gamma one)
+        return 1 + all_distances * np.exp(-k*np.asarray(all_distances))
+        
     
     def generate_solution_path(self,
                                graph: nx.DiGraph, 
@@ -117,13 +144,13 @@ class Building(object):
                 new_p_intra = 1
                 new_p_inter = 0
             
-            # TODO: Make the avail neigh have a weight from a gaussian kernel and make 
-            # np.random.choice where size = len(avail_neigh)
-            # Shuffle neighbors to get more curvy paths
-            rng = np.random.default_rng()
-            rng.shuffle(avail_neigh)
+            # Reorder neighbors according to their distance from the source node
+            w_neigh = self.gaussian_weight(np.repeat([start], len(avail_neigh), axis = 0), avail_neigh, std = 1) # TODO: Set std in difficulty
+            w_neigh = w_neigh / sum(w_neigh)
+            neigh_order_idx = np.random.choice(np.arange(len(avail_neigh)), size = len(avail_neigh), replace = False, p = w_neigh)
 
-            for n in avail_neigh:
+            for idx in neigh_order_idx:
+                n = avail_neigh[idx]
                 if n not in visited:
                     solution = self.generate_solution_path(graph,
                                                             n,
@@ -137,7 +164,7 @@ class Building(object):
                     if solution.size != 0:
                         return solution
 
-        
+        visited.remove(start)
         return no_solution
 
                 
@@ -148,62 +175,97 @@ class Building(object):
                        non_solution_edges: int,
                        p_intra_pop: float,
                        p_inter_pop: float) -> nx.DiGraph:
-        all_connected_nodes = path.copy()
+        # Define nodes to expand. Cannot be stair/slide head nodes nor the exit node
+        all_valid_nodes = path[:-1].copy() 
+        for i in range(len(path) - 1):
+            valid = path[i][-1] == path[i + 1][-1]
+            if not valid:
+                all_valid_nodes.remove(path[i])
+        all_weights = self.node_weight(all_valid_nodes, k=1)
+        
+        # TODO: Check that the weights make sense
+        
         solution_length = nx.dijkstra_path_length(graph, self.start_pos, self.exit_pos)
         
         for _ in range(non_solution_edges):
-            # Choose a random node from all connected nodes
-            node_idx = np.random.randint(len(all_connected_nodes), size = 1)
-            node = all_connected_nodes[node_idx.item()]
+            # (Re)-normalize the weights
+            all_weights = all_weights / np.sum(all_weights)
+            
+            # Categorically sample a node from all connected nodes
+            node_idx = np.random.choice(np.arange(len(all_valid_nodes)), size = 1, p = all_weights)
+            # node_idx = np.random.randint(len(all_connected_nodes), size = 1)
+            node = all_valid_nodes[node_idx.item()]
             
             # We cannot ascend/descend when on the solution path nor when there's already a stair/slide
             p_intra = 1 if (node in path) or (np.any([u[-1] != v[-1] for u, v in graph.edges(node)])) else p_intra_pop
             p_inter = 0 if (node in path) or (np.any([u[-1] != v[-1] for u, v in graph.edges(node)])) else p_inter_pop
             
             # Draw from a categorical distr, whether to ascend/descend/stay
-            order = np.random.choice(["intra", "inter"], 1, p = [p_intra, p_inter], replace=False)
-            if order == "intra":
-                # Only look at valid neighbors on the same floor
-                non_diag_neigh = [[-1, 0], [0, -1], [0, 1], [1, 0]]
-                avail_neigh = set((max(0, min(node[0]+i, self.length-1)), max(0, min(node[1]+j, self.width-1)), node[-1]) for i, j in non_diag_neigh)
-                avail_neigh.discard(node)
-                avail_neigh = list(avail_neigh)
-                assert not np.any([avail_neigh[i] > (self.length-1, self.width-1, self.floors-1) for i in range(len(avail_neigh))]), "One or more of the node neighbors exceed the building's dimensions"
-            else:
-                avail_neigh = np.indices((self.length, self.width, self.floors)).reshape(3, -1).T
-                avail_neigh = avail_neigh[avail_neigh[...,-1] != node[-1]]
-                avail_neigh = list(map(tuple, avail_neigh.tolist()))
+            order = np.random.choice(["intra", "inter"], 2, p = [p_intra, p_inter], replace=False) if p_intra != 1 else ["intra"]
+            for c in order:
+                if c == "intra":
+                    # Only look at valid neighbors on the same floor
+                    non_diag_neigh = [[-1, 0], [0, -1], [0, 1], [1, 0]]
+                    avail_neigh = set((max(0, min(node[0]+i, self.length-1)), max(0, min(node[1]+j, self.width-1)), node[-1]) for i, j in non_diag_neigh)
+                    avail_neigh.discard(node)
+                    avail_neigh = list(avail_neigh)
+                    assert not np.any([avail_neigh[i] > (self.length-1, self.width-1, self.floors-1) for i in range(len(avail_neigh))]), "One or more of the node neighbors exceed the building's dimensions"
+                else:
+                    # If we already have intra-floor steps, we can't make a stair/slide. Special case: No slide on the start node
+                    if graph.out_degree(node) == 1 and node != self.start_pos:
+                        avail_neigh = np.indices((self.length, self.width, self.floors)).reshape(3, -1).T
+                        avail_neigh = avail_neigh[avail_neigh[...,-1] != node[-1]]
+                        avail_neigh = list(map(tuple, avail_neigh.tolist()))
+                    else:
+                        avail_neigh = []
 
-            # Prune available neighbors
-            for n in avail_neigh.copy():
-                # We don't want open spaces/loops
-                if nx.has_path(graph, node, n):
-                    avail_neigh.remove(n)
-                elif nx.has_path(graph, n, node):
-                    avail_neigh.remove(n)
-                
-                # We do not want to accidentally create a shortcut or another solution path than the intended
-                elif nx.has_path(graph, self.start_pos, node) and nx.has_path(graph, n, self.exit_pos):
-                    if (nx.dijkstra_path_length(graph, self.start_pos, node) + 1 + \
-                        nx.dijkstra_path_length(graph, n, self.exit_pos)
-                        <= solution_length):
-                            avail_neigh.remove(n)
-                
-                elif nx.has_path(graph, self.start_pos, n) and nx.has_path(graph, node, self.exit_pos):
-                    if (nx.dijkstra_path_length(graph, self.start_pos, n) + 1 + \
-                        nx.dijkstra_path_length(graph, node, self.exit_pos)
-                        <= solution_length):
-                            avail_neigh.remove(n)
-            
-            # TODO: Make the avail neigh have a weight from a gaussian kernel and make 
-            # np.random.choice where size = len(avail_neigh)
+                # Prune available neighbors
+                for n in avail_neigh.copy():
+                    # No duplicate edges
+                    # if graph.has_edge(node, n) or graph.has_edge(n, node):
+                    #     avail_neigh.remove(n)
+                    
+                    # We don't want open spaces/loops # TODO: Consider whether this should be included
+                    if nx.has_path(graph, node, n):
+                        avail_neigh.remove(n)
+                        continue
+                    
+                    if nx.has_path(graph, n, node):
+                        avail_neigh.remove(n)
+                        continue
+                    
+                    # For a bidirectional connection, we need to check both paths
+                    edge_check = [(node, n)]
+                    if node[-1] == n[1]:
+                        edge_check.append((n, node))
+                    
+                    for u, v in edge_check:
+                        # We do not want to accidentally create a shortcut or another solution path than the intended
+                        if nx.has_path(graph, self.start_pos, u) and nx.has_path(graph, v, self.exit_pos):
+                            if (nx.dijkstra_path_length(graph, self.start_pos, u) + 1 + \
+                                nx.dijkstra_path_length(graph, v, self.exit_pos)
+                                <= solution_length):
+                                    avail_neigh.remove(n)
+                                    break
+                    
+                if avail_neigh:
+                    break
+                    
             # Only if there are neighbors to connect
             if avail_neigh:
-                new_node_idx = np.random.randint(len(avail_neigh))
-                new_node = avail_neigh[new_node_idx]
+                w_neigh = self.gaussian_weight(np.repeat([node], len(avail_neigh), axis = 0), avail_neigh, std = 1) # TODO: Set std in difficulty
+                w_neigh = w_neigh / sum(w_neigh)
+                new_node_idx = np.random.choice(np.arange(len(avail_neigh)), size = 1, p = w_neigh)
+                new_node = avail_neigh[new_node_idx.item()]
                 
                 self.draw_path(graph, [node, new_node])    
-                all_connected_nodes.append(new_node)
+                all_valid_nodes.append(new_node)
+                
+                # Update all_weights with node_weight
+                all_weights = np.append(all_weights, self.node_weight([new_node], k=1))
+            else:
+                all_weights = np.delete(all_weights, all_valid_nodes.index(node))
+                all_valid_nodes.remove(node)
         
         return graph
 
@@ -214,14 +276,27 @@ class Building(object):
         for node_start, node_end in zip(path[:-1], path[1:]):
             # Ascend
             if node_start[-1] < node_end[-1]:
+                graph.remove_edges_from(list(graph.out_edges(node_start)))
                 graph.add_edge(node_start, node_end, kind="stair")
+                graph.nodes[node_start]["kind"] = "stair_head"
+                graph.nodes[node_end]["kind"] = "stair_tail"
             # Descend
             elif node_start[-1] > node_end[-1]:
+                graph.remove_edges_from(list(graph.out_edges(node_start)))
                 graph.add_edge(node_start, node_end, kind="slide")
+                graph.nodes[node_start]["kind"] = "slide_head"
+                graph.nodes[node_end]["kind"] = "slide_tail"
+            # Once you reach the exit, you are done
+            elif node_end == self.exit_pos:
+                graph.add_edge(node_start, node_end, kind="floor")
             # Stay
             else:
+                attr = nx.get_node_attributes(graph, "kind")
                 graph.add_edge(node_start, node_end, kind="floor")
-                graph.add_edge(node_end, node_start, kind="floor")
+                
+                # If the node we go to ascends/descends it shouldn't be bidirectional
+                if not (node_end in attr.keys() and (attr[node_end] == "stair_head" or attr[node_end] == "slide_head")):
+                    graph.add_edge(node_end, node_start, kind="floor")
         
         return graph
 
@@ -271,6 +346,10 @@ class Building(object):
         return
 
 if __name__ == "__main__":
-    n, x, y = 2, 5, 5 # sys.argv[1:4]
-    diff = 5
+    n, x, y = 3, 5, 5 # sys.argv[1:4]
+    diff = 2
     building = Building(n, x, y, difficulty=diff)
+    
+    # TODO: Quantitatively evaluate e.g
+    # 1) Number of off-roads and how long they are for different difficulty settings
+    # 2) Parameter sweeps
