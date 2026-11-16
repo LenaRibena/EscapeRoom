@@ -10,7 +10,8 @@ class Building(object):
                  floors: int, 
                  width: int, 
                  length: int,
-                 difficulty: int = 3) -> None:
+                 difficulty: int = 3,
+                 verbose: bool = False) -> None:
         assert isinstance(floors, int) and floors > 0, "floors must be positive"
         assert isinstance(width, int) and width > 0, "width must be positive"
         assert isinstance(length, int) and length > 0, "length must be positive"
@@ -24,29 +25,33 @@ class Building(object):
         self.exit_pos = (0, 0, 0)
         
         settings_kw = self.configure_difficulty(difficulty)
-        
         graph = self.initialize_graph()
         path = self.generate_solution_path(graph=graph, 
-                                           start=self.start_pos, 
-                                           end=self.exit_pos, 
-                                           path=np.empty((0, 3), dtype = int), 
-                                           visited=set(), 
-                                           p_intra=self.p_intra_sol,
-                                           p_inter=self.p_inter_sol,
-                                           min_edges=self.min_edges,
-                                           max_edges=self.max_edges)
+                                        start=self.start_pos, 
+                                        end=self.exit_pos, 
+                                        path=np.empty((0, 3), dtype = int), 
+                                        visited=set(), 
+                                        p_intra=self.p_intra_sol,
+                                        p_inter=self.p_inter_sol,
+                                        min_edges=self.min_edges,
+                                        max_edges=self.max_edges)
         self.path = list(map(tuple, path.tolist()))
         
         self.graph = self.draw_path(graph=graph, path=self.path)
-        self.display_graph(graph=graph)
         
-        self.graph = self.populate_graph(graph=self.graph, 
-                                         path=self.path, 
-                                         non_solution_edges=self.non_solution_edges,
-                                         p_intra_pop=self.p_intra_pop,
-                                         p_inter_pop=self.p_inter_pop)
+        if verbose:
+            self.display_graph(graph=graph)
         
-        self.display_graph(graph=self.graph)
+        self.graph, self.all_valid_notes = self.populate_graph(graph=self.graph, 
+                                        path=self.path, 
+                                        non_solution_edges=self.non_solution_edges,
+                                        p_intra_pop=self.p_intra_pop,
+                                        p_inter_pop=self.p_inter_pop)
+        
+        if verbose:
+            self.display_graph(graph=self.graph)
+            self.validate_graph()
+            print("Level created")
 
     def configure_difficulty(self, difficulty: int) -> None:
         volume = self.length * self.width * self.floors # TODO: Length, width and floors could be adjusted by difficulty
@@ -64,6 +69,8 @@ class Building(object):
         # Create a graph with no edges
         graph = nx.grid_graph(dim = (self.floors, self.width, self.length))
         graph = nx.DiGraph(nx.create_empty_copy(graph))
+        nx.set_node_attributes(graph, "wall", "kind")
+        graph.nodes[self.start_pos]["kind"] = "floor"
         
         return graph
 
@@ -188,17 +195,20 @@ class Building(object):
         solution_length = nx.dijkstra_path_length(graph, self.start_pos, self.exit_pos)
         
         for _ in range(non_solution_edges):
+            if not all_valid_nodes:
+                break
+            
             # (Re)-normalize the weights
             all_weights = all_weights / np.sum(all_weights)
+            node_attr = nx.get_node_attributes(graph, "kind")
             
             # Categorically sample a node from all connected nodes
             node_idx = np.random.choice(np.arange(len(all_valid_nodes)), size = 1, p = all_weights)
-            # node_idx = np.random.randint(len(all_connected_nodes), size = 1)
             node = all_valid_nodes[node_idx.item()]
             
-            # We cannot ascend/descend when on the solution path nor when there's already a stair/slide
-            p_intra = 1 if (node in path) or (np.any([u[-1] != v[-1] for u, v in graph.edges(node)])) else p_intra_pop
-            p_inter = 0 if (node in path) or (np.any([u[-1] != v[-1] for u, v in graph.edges(node)])) else p_inter_pop
+            # We cannot ascend/descend when on the solution path nor when it's a stair/slide head/tail
+            p_intra = 1 if (node_attr[node] != "dead_end") else p_intra_pop
+            p_inter = 0 if (node_attr[node] != "dead_end") else p_inter_pop
             
             # Draw from a categorical distr, whether to ascend/descend/stay
             order = np.random.choice(["intra", "inter"], 2, p = [p_intra, p_inter], replace=False) if p_intra != 1 else ["intra"]
@@ -211,20 +221,12 @@ class Building(object):
                     avail_neigh = list(avail_neigh)
                     assert not np.any([avail_neigh[i] > (self.length-1, self.width-1, self.floors-1) for i in range(len(avail_neigh))]), "One or more of the node neighbors exceed the building's dimensions"
                 else:
-                    # If we already have intra-floor steps, we can't make a stair/slide. Special case: No slide on the start node
-                    if graph.out_degree(node) == 1 and node != self.start_pos:
-                        avail_neigh = np.indices((self.length, self.width, self.floors)).reshape(3, -1).T
-                        avail_neigh = avail_neigh[avail_neigh[...,-1] != node[-1]]
-                        avail_neigh = list(map(tuple, avail_neigh.tolist()))
-                    else:
-                        avail_neigh = []
+                    avail_neigh = np.indices((self.length, self.width, self.floors)).reshape(3, -1).T
+                    avail_neigh = avail_neigh[avail_neigh[...,-1] != node[-1]]
+                    avail_neigh = list(map(tuple, avail_neigh.tolist()))
 
                 # Prune available neighbors
-                for n in avail_neigh.copy():
-                    # No duplicate edges
-                    # if graph.has_edge(node, n) or graph.has_edge(n, node):
-                    #     avail_neigh.remove(n)
-                    
+                for n in avail_neigh.copy():                    
                     # We don't want open spaces/loops # TODO: Consider whether this should be included
                     if nx.has_path(graph, node, n):
                         avail_neigh.remove(n)
@@ -236,7 +238,7 @@ class Building(object):
                     
                     # For a bidirectional connection, we need to check both paths
                     edge_check = [(node, n)]
-                    if node[-1] == n[1]:
+                    if node[-1] == n[-1]:
                         edge_check.append((n, node))
                     
                     for u, v in edge_check:
@@ -258,16 +260,44 @@ class Building(object):
                 new_node_idx = np.random.choice(np.arange(len(avail_neigh)), size = 1, p = w_neigh)
                 new_node = avail_neigh[new_node_idx.item()]
                 
-                self.draw_path(graph, [node, new_node])    
+                # Add the new path
+                assert nx.has_path(graph, self.start_pos, node), (
+                f"Selected node {node} is unreachable before expansion"
+                )
+                self.draw_path(graph, [node, new_node])  
+                assert nx.has_path(graph, self.start_pos, new_node), (
+                f"New node {new_node} became unreachable after expansion"
+                )
+                  
                 all_valid_nodes.append(new_node)
-                
-                # Update all_weights with node_weight
                 all_weights = np.append(all_weights, self.node_weight([new_node], k=1))
+                
+                # If we made a stair/slide, it's no longer valid
+                if c == "inter":
+                    all_weights = np.delete(all_weights, all_valid_nodes.index(node))
+                    all_valid_nodes.remove(node)                  
             else:
                 all_weights = np.delete(all_weights, all_valid_nodes.index(node))
                 all_valid_nodes.remove(node)
         
-        return graph
+        return graph, all_valid_nodes
+
+    def validate_graph(self):
+        reachable = nx.descendants(self.graph, self.start_pos)
+        reachable.add(self.start_pos)
+        
+        for u in self.graph.nodes:
+            if self.graph.nodes[u]["kind"] == "wall":
+                continue
+                
+            if u not in reachable:
+                print(f"\nUnreachable dead end: {u}")
+
+                print("Incoming edges:")
+                print(list(self.graph.in_edges(u, data=True)))
+
+                print("Outgoing edges:")
+                print(list(self.graph.out_edges(u, data=True)))
 
     def draw_path(self,
                   graph: nx.DiGraph,
@@ -286,17 +316,22 @@ class Building(object):
                 graph.add_edge(node_start, node_end, kind="slide")
                 graph.nodes[node_start]["kind"] = "slide_head"
                 graph.nodes[node_end]["kind"] = "slide_tail"
-            # Once you reach the exit, you are done
-            elif node_end == self.exit_pos:
-                graph.add_edge(node_start, node_end, kind="floor")
             # Stay
             else:
                 attr = nx.get_node_attributes(graph, "kind")
                 graph.add_edge(node_start, node_end, kind="floor")
                 
-                # If the node we go to ascends/descends it shouldn't be bidirectional
-                if not (node_end in attr.keys() and (attr[node_end] == "stair_head" or attr[node_end] == "slide_head")):
+                # Only dead ends can be overwritten - not stairs and slides
+                if attr[node_start] == "dead_end":
+                    graph.nodes[node_start]["kind"] = "floor"
+                
+                # If the node we go to ascends/descends or is the exit, it shouldn't be bidirectional
+                if not (attr[node_end] == "stair_head" or attr[node_end] == "slide_head" or node_end == self.exit_pos):
                     graph.add_edge(node_end, node_start, kind="floor")
+                    
+                    # Only ordinary floor nodes can become dead ends - not stairs and slides
+                    if attr[node_end] == "floor":
+                        graph.nodes[node_end]["kind"] = "dead_end"
         
         return graph
 
@@ -305,18 +340,12 @@ class Building(object):
         fig = plt.figure(figsize=(10, 8))
         ax = fig.add_subplot(111, projection='3d')
 
-        nodes = list(graph.nodes())
+        # Fixed arrowhead length in data coordinates
+        arrow_size = 0.2
 
-        xs = [n[0] for n in nodes]
-        ys = [n[1] for n in nodes]
-        zs = [n[2] for n in nodes]
+        for u, v, data in graph.edges(data=True):
 
-        ax.scatter(xs, ys, zs, color='blue', s=40, depthshade=False)
-
-        for edge in graph.edges.data():
-            u = edge[0]
-            v = edge[1]
-            kind = edge[2]["kind"]
+            kind = data["kind"]
 
             if kind == "slide":
                 color = 'green'
@@ -325,7 +354,19 @@ class Building(object):
             else:
                 color = 'gray'
 
-            # Draw the complete edge
+            # Direction vector
+            dx = v[0] - u[0]
+            dy = v[1] - u[1]
+            dz = v[2] - u[2]
+
+            length = np.sqrt(dx**2 + dy**2 + dz**2)
+
+            # Unit direction vector
+            dx /= length
+            dy /= length
+            dz /= length
+
+            # Draw complete edge
             ax.plot(
                 [u[0], v[0]],
                 [u[1], v[1]],
@@ -333,6 +374,20 @@ class Building(object):
                 color=color,
                 alpha=0.8,
                 linewidth=2
+            )
+
+            # Draw arrowhead with fixed length
+            ax.quiver(
+                v[0] - arrow_size * dx,
+                v[1] - arrow_size * dy,
+                v[2] - arrow_size * dz,
+                arrow_size * dx,
+                arrow_size * dy,
+                arrow_size * dz,
+                color=color,
+                arrow_length_ratio=0.5,
+                linewidth=2,
+                normalize=False
             )
 
         ax.set_xlabel('X')
@@ -343,12 +398,10 @@ class Building(object):
 
         plt.show()
 
-        return
-
 if __name__ == "__main__":
     n, x, y = 3, 5, 5 # sys.argv[1:4]
     diff = 2
-    building = Building(n, x, y, difficulty=diff)
+    building = Building(n, x, y, difficulty=diff, verbose = True)
     
     # TODO: Quantitatively evaluate e.g
     # 1) Number of off-roads and how long they are for different difficulty settings
