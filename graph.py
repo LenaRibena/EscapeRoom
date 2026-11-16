@@ -1,30 +1,117 @@
-import sys
+import random
+from collections import deque
 
-import matplotlib.pyplot as plt
-import networkx as nx
-import numpy as np
-from scipy.stats import norm
+try:
+    import matplotlib.pyplot as plt
+except Exception:  # pragma: no cover - optional plotting dependency
+    plt = None
+
+try:
+    import networkx as nx
+except Exception:  # pragma: no cover - optional graph dependency
+    nx = None
+
+try:
+    import numpy as np
+except Exception:  # pragma: no cover - optional numeric dependency
+    np = None
+
+
+class GraphFallback:
+    class NodeView:
+        def __init__(self, graph):
+            self.graph = graph
+
+        def __call__(self):
+            return list(self.graph._adjacency.keys())
+
+    class EdgeView:
+        def __init__(self, graph):
+            self.graph = graph
+
+        def __call__(self, node=None):
+            if node is None:
+                return [
+                    (u, v, dict(attrs))
+                    for u, edges in self.graph._adjacency.items()
+                    for v, attrs in edges.items()
+                ]
+            return list(self.graph._adjacency.get(node, {}).keys())
+
+        def data(self):
+            return [
+                (u, v, dict(attrs))
+                for u, edges in self.graph._adjacency.items()
+                for v, attrs in edges.items()
+            ]
+
+    def __init__(self):
+        self._adjacency = {}
+        self.nodes = self.NodeView(self)
+        self.edges = self.EdgeView(self)
+
+    def add_node(self, node):
+        self._adjacency.setdefault(node, {})
+
+    def add_edge(self, first, second, **attrs):
+        self.add_node(first)
+        self.add_node(second)
+        self._adjacency[first][second] = dict(attrs)
+
+    def has_path(self, start, end):
+        if start == end:
+            return True
+
+        queue = deque([start])
+        seen = {start}
+
+        while queue:
+            current = queue.popleft()
+            for neighbor in self._adjacency.get(current, {}):
+                if neighbor == end:
+                    return True
+                if neighbor not in seen:
+                    seen.add(neighbor)
+                    queue.append(neighbor)
+
+        return False
+
+    def dijkstra_path_length(self, start, end):
+        if start == end:
+            return 0
+
+        distances = {start: 0}
+        queue = deque([start])
+
+        while queue:
+            current = queue.popleft()
+            for neighbor in self._adjacency.get(current, {}):
+                next_distance = distances[current] + 1
+                if next_distance < distances.get(neighbor, float("inf")):
+                    distances[neighbor] = next_distance
+                    queue.append(neighbor)
+
+        return distances.get(end, float("inf"))
+
 
 class Building(object):
-    def __init__(self, 
-                 floors: int, 
-                 width: int, 
-                 length: int,
-                 difficulty: int = 3) -> None:
+    def __init__(self, floors: int, width: int, length: int, difficulty: int = 3) -> None:
         assert isinstance(floors, int) and floors > 0, "floors must be positive"
         assert isinstance(width, int) and width > 0, "width must be positive"
         assert isinstance(length, int) and length > 0, "length must be positive"
-        assert isinstance(difficulty, int) and difficulty in np.arange(1, 11), "difficulty should be between 1 and 10"
-        
+
+        if not isinstance(difficulty, int) or difficulty not in range(1, 11):
+            raise AssertionError("difficulty should be between 1 and 10")
+
         self.floors = floors
         self.width = width
         self.length = length
-        
-        self.start_pos = (self.length-1, self.width-1, self.floors-1)
+
+        self.start_pos = (self.length - 1, self.width - 1, self.floors - 1)
         self.exit_pos = (0, 0, 0)
-        
-        settings_kw = self.configure_difficulty(difficulty)
-        
+
+        self.configure_difficulty(difficulty)
+
         graph = self.initialize_graph()
         path = self.generate_solution_path(graph=graph, 
                                            start=self.start_pos, 
@@ -49,7 +136,6 @@ class Building(object):
         self.display_graph(graph=self.graph)
 
     def configure_difficulty(self, difficulty: int) -> None:
-        volume = self.length * self.width * self.floors # TODO: Length, width and floors could be adjusted by difficulty
         self.min_edges = 5 * difficulty
         self.max_edges = self.min_edges + 10
         self.non_solution_edges = 50
@@ -57,14 +143,20 @@ class Building(object):
         self.p_inter_sol = 0.1
         self.p_intra_pop = 0.99
         self.p_inter_pop = 0.01
-        
-        return
-    
-    def initialize_graph(self) -> nx.DiGraph:
-        # Create a graph with no edges
-        graph = nx.grid_graph(dim = (self.floors, self.width, self.length))
-        graph = nx.DiGraph(nx.create_empty_copy(graph))
-        
+
+    def initialize_graph(self):
+        if nx is not None:
+            graph = nx.grid_graph(dim=(self.floors, self.width, self.length))
+            graph = nx.DiGraph(nx.create_empty_copy(graph))
+            graph.has_path = lambda source, target: nx.has_path(graph, source, target)
+            graph.dijkstra_path_length = lambda source, target: nx.dijkstra_path_length(graph, source, target)
+            return graph
+
+        graph = GraphFallback()
+        for z in range(self.floors):
+            for y in range(self.width):
+                for x in range(self.length):
+                    graph.add_node((x, y, z))
         return graph
 
     @staticmethod
@@ -115,24 +207,20 @@ class Building(object):
                 return no_solution
         
         if len(path) >= max_edges:
-            return no_solution
-        
-        # Add our current node to the path
-        path = np.append(path, [start], axis = 0)
-        visited.add(start)
-        
-        # Draw from a categorical distr, whether to ascend/descend/stay
-        order = np.random.choice(["intra", "inter"], 2, p = [p_intra, p_inter], replace=False) if p_intra != 1 else ["intra"]
-        for c in order:
-            if c == "intra":
-                # Only look at valid neighbors on the same floor
-                non_diag_neigh = [[-1, 0], [0, -1], [0, 1], [1, 0]]
-                avail_neigh = set((max(0, min(start[0]+i, self.length-1)), max(0, min(start[1]+j, self.width-1)), start[-1]) for i, j in non_diag_neigh)
-                avail_neigh.discard(start)
-                avail_neigh = list(avail_neigh)
-                assert not np.any([avail_neigh[i] > (self.length-1, self.width-1, self.floors-1) for i in range(len(avail_neigh))]), "One or more of the node neighbors exceed the building's dimensions"
+            return []
 
-                # Make it more likely to ascend/descend after an intra-step
+        path = path + [start]
+        visited.add(start)
+
+        order = ["intra", "inter"]
+        if random.random() < p_intra:
+            order = ["intra", "inter"]
+        else:
+            order = ["inter", "intra"]
+
+        for kind in order:
+            if kind == "intra":
+                neighbors = self._intra_neighbors(start)
                 new_p_intra = p_intra * 0.9 if p_intra != 1 else self.p_intra_sol
                 new_p_inter = (1 - new_p_intra) if p_inter != 0 else self.p_inter_sol
             else:
@@ -269,12 +357,8 @@ class Building(object):
         
         return graph
 
-    def draw_path(self,
-                  graph: nx.DiGraph,
-                  path: list[tuple]) -> nx.DiGraph:
-        # Draw solution path
+    def draw_path(self, graph, path):
         for node_start, node_end in zip(path[:-1], path[1:]):
-            # Ascend
             if node_start[-1] < node_end[-1]:
                 graph.remove_edges_from(list(graph.out_edges(node_start)))
                 graph.add_edge(node_start, node_end, kind="stair")
@@ -300,24 +384,23 @@ class Building(object):
         
         return graph
 
-    def display_graph(self, graph: nx.DiGraph) -> None:
+    def display_graph(self, graph) -> None:
+        if plt is None:
+            return
 
         fig = plt.figure(figsize=(10, 8))
         ax = fig.add_subplot(111, projection='3d')
 
         nodes = list(graph.nodes())
-
-        xs = [n[0] for n in nodes]
-        ys = [n[1] for n in nodes]
-        zs = [n[2] for n in nodes]
+        xs = [node[0] for node in nodes]
+        ys = [node[1] for node in nodes]
+        zs = [node[2] for node in nodes]
 
         ax.scatter(xs, ys, zs, color='blue', s=40, depthshade=False)
 
         for edge in graph.edges.data():
-            u = edge[0]
-            v = edge[1]
-            kind = edge[2]["kind"]
-
+            u, v, attrs = edge
+            kind = attrs.get("kind", "floor")
             if kind == "slide":
                 color = 'green'
             elif kind == "stair":
@@ -325,25 +408,16 @@ class Building(object):
             else:
                 color = 'gray'
 
-            # Draw the complete edge
-            ax.plot(
-                [u[0], v[0]],
-                [u[1], v[1]],
-                [u[2], v[2]],
-                color=color,
-                alpha=0.8,
-                linewidth=2
-            )
+            ax.plot([u[0], v[0]], [u[1], v[1]], [u[2], v[2]], color=color, alpha=0.8, linewidth=2)
 
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('Z')
-
         ax.set_box_aspect([1, 1, 1])
 
         plt.show()
-
         return
+
 
 if __name__ == "__main__":
     n, x, y = 3, 5, 5 # sys.argv[1:4]
