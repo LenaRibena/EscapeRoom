@@ -4,7 +4,7 @@ from collections.abc import Iterable
 
 import numpy as np
 
-from graph import Building
+from src.graph import Building
 from src.wfc_graph import graph_edge_connections
 from src.wfc_solver import solve_wfc
 from src.wfc_tiles import Cell, Direction, PortKind, Tile
