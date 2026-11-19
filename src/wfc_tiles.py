@@ -45,6 +45,16 @@ _OPPOSITE_DIRECTION = {
 class ContradictionError(ValueError):
     """Raised when propagation leaves a cell with no possible tiles."""
 
+    def __init__(
+        self,
+        message: str,
+        cell: Cell | None = None,
+        domain: Iterable[int] = (),
+    ) -> None:
+        super().__init__(message)
+        self.cell = cell
+        self.domain = tuple(sorted(domain))
+
 
 @dataclass(frozen=True)
 class Tile:
@@ -99,7 +109,11 @@ def propagate(
     while queue:
         cell = queue.pop()
         if not domains[cell]:
-            raise ContradictionError(f"Cell {cell} has no possible tiles")
+            raise ContradictionError(
+                f"Cell {cell} has no possible tiles",
+                cell=cell,
+                domain=domains[cell],
+            )
 
         for direction, offset in _DIRECTION_OFFSETS.items():
             neighbor_cell: Cell = (
@@ -118,7 +132,9 @@ def propagate(
 
             if not reduced_domain:
                 raise ContradictionError(
-                    f"Cell {neighbor_cell} has no compatible tiles"
+                    f"Cell {neighbor_cell} has no compatible tiles",
+                    cell=neighbor_cell,
+                    domain=reduced_domain,
                 )
 
             if reduced_domain != neighbor_domain:
