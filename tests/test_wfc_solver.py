@@ -1,7 +1,16 @@
+from collections import Counter
+import random
 import unittest
+from unittest.mock import patch
 
-from src.wfc_solver import solve_wfc
-from src.wfc_tiles import ContradictionError, Direction, PortKind, Tile
+from src.wfc_solver import _select_route_tile, solve_wfc
+from src.wfc_tiles import (
+    ContradictionError,
+    Direction,
+    PortKind,
+    Tile,
+    build_compatibility,
+)
 
 
 def tile(name, **ports):
@@ -74,8 +83,245 @@ class SolveWfcTests(unittest.TestCase):
                 fixed_tiles={(0, 1, 0): 0},
             )
 
+    def test_allowed_tiles_restricts_endpoint_domains(self):
+        tiles = [
+            tile("empty"),
+            tile("east_connector", E="SLIDE"),
+            tile("west_connector", W="SLIDE"),
+        ]
+        cells = [(0, 0, 0), (0, 1, 0)]
+
+        result = solve_wfc(
+            cells,
+            tiles,
+            allowed_tiles={
+                cells[0]: {1},
+                cells[1]: {2},
+            },
+            required_pairs=[(cells[0], cells[1])],
+            seed=1,
+        )
+
+        self.assertEqual(result, {cells[0]: 1, cells[1]: 2})
+
     def test_empty_grid_returns_empty_layout(self):
         self.assertEqual(solve_wfc([], [], seed=1), {})
+
+    def test_global_pruning_failure_reports_phase_and_endpoint_domain(self):
+        start = (0, 0, 0)
+        end = (0, 2, 0)
+        tiles = [
+            tile("east_slide", E="SLIDE"),
+            tile("west_slide", W="SLIDE"),
+        ]
+
+        with self.assertRaises(ContradictionError) as context:
+            solve_wfc(
+                [start, end],
+                tiles,
+                fixed_tiles={start: 0, end: 1},
+                required_typed_pairs=[(start, end, PortKind.SLIDE)],
+                max_attempts=1,
+            )
+
+        error = context.exception
+        self.assertEqual(error.failure.phase, "global_reachability_pruning")
+        self.assertEqual(error.failure.cell, start)
+        self.assertEqual(error.failure.domain, (0,))
+        self.assertEqual(error.failure.attempt, 1)
+
+    def test_route_selector_failure_reports_collapse_selection_phase(self):
+        start = (1, 0, 0)
+        end = (0, 0, 0)
+        isolated = (4, 4, 4)
+        tiles = [
+            tile("empty"),
+            tile("empty_variant"),
+            tile("down_slide", D="SLIDE"),
+            tile("up_slide", U="SLIDE"),
+        ]
+
+        with self.assertRaises(ContradictionError) as context:
+            solve_wfc(
+                [start, end, isolated],
+                tiles,
+                fixed_tiles={start: 2, end: 3},
+                required_typed_pairs=[(start, end, PortKind.SLIDE)],
+                required_horizontal_steps=1,
+                max_attempts=1,
+            )
+
+        error = context.exception
+        self.assertEqual(error.failure.phase, "cell_collapse_selection")
+        self.assertEqual(error.failure.cell, start)
+        self.assertEqual(error.failure.domain, (2,))
+
+    def test_preferred_empty_tile_is_used_after_required_route_is_collapsed(self):
+        start, middle, end, isolated = (
+            (0, 0, 0),
+            (0, 1, 0),
+            (0, 2, 0),
+            (4, 4, 4),
+        )
+        tiles = [
+            tile("empty"),
+            tile("empty_variant"),
+            tile("slide_start", E="SLIDE"),
+            tile("slide_middle", W="SLIDE", E="SLIDE"),
+            tile("slide_end", W="SLIDE"),
+        ]
+
+        result = solve_wfc(
+            [start, middle, end, isolated],
+            tiles,
+            fixed_tiles={start: 2, end: 4},
+            required_typed_pairs=[(start, end, PortKind.SLIDE)],
+            preferred_tile_index=0,
+            seed=1,
+        )
+
+        self.assertEqual(result[start], 2)
+        self.assertEqual(result[middle], 3)
+        self.assertEqual(result[end], 4)
+        self.assertEqual(result[isolated], 0)
+
+    def test_tile_aware_connectivity_preserves_a_valid_wfc_solution(self):
+        start, middle, end = (0, 0, 0), (0, 1, 0), (0, 2, 0)
+        tiles = [
+            tile("start", E="SLIDE"),
+            tile("middle", W="SLIDE", E="SLIDE"),
+            tile("end", W="SLIDE"),
+            tile("empty"),
+        ]
+
+        result = solve_wfc(
+            [start, middle, end],
+            tiles,
+            fixed_tiles={start: 0, end: 2},
+            required_typed_pairs=[(start, end, PortKind.SLIDE)],
+            tile_aware_connectivity=True,
+            seed=4,
+        )
+
+        self.assertEqual(result, {start: 0, middle: 1, end: 2})
+
+    def test_endpoint_frontier_selects_the_first_unresolved_route_cell(self):
+        start, first, second, end = (
+            (0, 0, 0),
+            (0, 1, 0),
+            (0, 2, 0),
+            (0, 3, 0),
+        )
+        tiles = [
+            tile("start", E="SLIDE"),
+            tile("end", W="SLIDE"),
+            tile("middle_a", W="SLIDE", E="SLIDE"),
+            tile("middle_b", W="SLIDE", E="SLIDE"),
+            tile("middle_c", W="SLIDE", E="SLIDE"),
+        ]
+        domains = {
+            start: {0},
+            first: {2, 3, 4},
+            second: {2, 3},
+            end: {1},
+        }
+        arguments = (
+            domains,
+            tiles,
+            [(start, end, PortKind.SLIDE)],
+            random.Random(5),
+            0,
+        )
+        keywords = {
+            "compatibility": build_compatibility(tiles),
+            "phase_counts": Counter(),
+        }
+
+        choice = _select_route_tile(
+            *arguments,
+            **keywords,
+            endpoint_frontier=True,
+        )
+
+        self.assertEqual(choice[0], first)
+
+    def test_one_step_lookahead_skips_an_immediately_contradictory_candidate(self):
+        start, middle, end = (0, 0, 0), (0, 1, 0), (0, 2, 0)
+        tiles = [
+            tile("start", E="SLIDE"),
+            tile("end", W="SLIDE"),
+            tile("middle_a", W="SLIDE", E="SLIDE"),
+            tile("middle_b", W="SLIDE", E="SLIDE"),
+        ]
+        domains = {
+            start: {0},
+            middle: {2, 3},
+            end: {1},
+        }
+        rejected_candidate = []
+
+        def propagate_with_one_bad_choice(trial_domains, compatibility, changed):
+            _ = compatibility, changed
+            candidate = next(iter(trial_domains[middle]))
+            if not rejected_candidate:
+                rejected_candidate.append(candidate)
+                raise ContradictionError("injected local lookahead contradiction")
+
+        with patch(
+            "src.wfc_solver.propagate",
+            side_effect=propagate_with_one_bad_choice,
+        ) as propagation:
+            choice = _select_route_tile(
+                domains,
+                tiles,
+                [(start, end, PortKind.SLIDE)],
+                random.Random(0),
+                0,
+                compatibility=build_compatibility(tiles),
+                endpoint_frontier=True,
+                candidate_lookahead=True,
+                phase_counts=Counter(),
+            )
+
+        self.assertEqual(propagation.call_count, 2)
+        self.assertEqual(choice[0], middle)
+        self.assertNotEqual(choice[1], rejected_candidate[0])
+
+    def test_local_propagation_failure_reports_initial_stage(self):
+        cells = [(0, 0, 0), (0, 1, 0)]
+        tiles = [
+            tile("east_walk", E="WALK"),
+            tile("empty"),
+        ]
+
+        with self.assertRaises(ContradictionError) as context:
+            solve_wfc(
+                cells,
+                tiles,
+                fixed_tiles={cells[0]: 0, cells[1]: 1},
+                max_attempts=1,
+            )
+
+        error = context.exception
+        self.assertEqual(error.failure.phase, "initial_propagation")
+        self.assertIn(error.failure.cell, cells)
+
+    def test_final_validation_failure_reports_its_stage(self):
+        with patch(
+            "src.wfc_solver.validate_global_constraints",
+            side_effect=ValueError("injected validation failure"),
+        ):
+            with self.assertRaises(ContradictionError) as context:
+                solve_wfc(
+                    [(0, 0, 0)],
+                    [tile("empty")],
+                    max_attempts=1,
+                )
+
+        self.assertEqual(
+            context.exception.failure.phase,
+            "final_validation",
+        )
 
 
 if __name__ == "__main__":

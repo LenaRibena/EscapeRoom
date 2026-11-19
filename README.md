@@ -32,3 +32,6 @@ from the graph itself to demonstrate topology preservation; it does not yet
 generate semantic rooms, walls, or doors. The example prints an ASCII
 floor-by-floor map of the generated walk connections and marks start, exit,
 and vertical transitions.
+
+For 3D WFC stair/slide generation, JSON export, route visualization, and the
+Blender handoff, see [BLENDER_INTEGRATION.md](BLENDER_INTEGRATION.md).
