@@ -1,37 +1,34 @@
 # EscapeRoom
-Exam project for the course 02563 Generative Methods for Computer Graphics
 
-## Constraining WFC with a building route
+Exam project for the course 02563 Generative Methods for Computer Graphics.
 
-`graph.py` represents building nodes as `(x, y, floor)` and records path and
-branch edge kinds as `floor`, `stair`, or `slide`. Convert the generated graph
-edges into required WFC port connections, then pass them to the solver:
+## Final 3D WFC building generation
 
-```python
-from src.wfc_graph import graph_edge_connections
-from src.wfc_solver import solve_wfc
+The current WFC implementation generates graph-constrained stair and slide
+routes on a refined 3D grid. It starts with the tile and port rules in
+`src/wfc_tiles.py`, solves tile domains with `src/wfc_solver.py` and
+`src/wfc_global.py`, and applies the solver to building routes in
+`src/wfc_building.py`. The graph-to-WFC adapter experiment is not part of this
+workflow.
 
-required_connections = graph_edge_connections(building.graph.edges(data=True))
-layout = solve_wfc(cells, tiles, required_connections=required_connections)
+Run the building visualization from the repository root:
+
+```powershell
+python -m examples.wfc_building_example --diagnostics --seed 10 --grid-resolution 3
 ```
 
-WFC cells use `(floor, x, y)` coordinates. Floor edges must be cardinally
-adjacent and translate to `WALK` ports. Stair and slide edges can span floors
-and change `(x, y)` in the current graph model; the adapter normally places
-the vertical transition at the source position and adds a horizontal walk on
-the destination floor. If that would collide with another required port, it
-anchors the vertical transition at the destination and adds the horizontal
-walk on the source floor instead. Bidirectional floor edges are deduplicated.
-Solver domains are filtered to those ports before collapse,
-preserving the graph's start-to-finish route and its represented branches in
-the generated layout.
+To save the visualization, add `--save-plot results\building.png`. To export
+the accepted route geometry as JSON for the Blender handoff:
 
-Run `python -m examples.graph_wfc_example` for a headless end-to-end example
-using the existing `Building` graph class. It derives a port-pattern tile set
-from the graph itself to demonstrate topology preservation; it does not yet
-generate semantic rooms, walls, or doors. The example prints an ASCII
-floor-by-floor map of the generated walk connections and marks start, exit,
-and vertical transitions.
+```powershell
+python -m examples.export_building_json results\building.json --seed 10 --grid-resolution 3
+```
 
-For 3D WFC stair/slide generation, JSON export, route visualization, and the
-Blender handoff, see [BLENDER_INTEGRATION.md](BLENDER_INTEGRATION.md).
+See [BLENDER_INTEGRATION.md](BLENDER_INTEGRATION.md) for generation settings,
+the JSON schema, coordinate conventions, and Blender integration details.
+
+Run the tests from the repository root:
+
+```powershell
+python -m unittest discover -s tests
+```
