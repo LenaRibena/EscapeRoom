@@ -15,7 +15,7 @@ class JsonExportTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.building = WFCBuilding(
-            floors=5, width=5, length=5, difficulty=2, seed=10,
+            floors=4, width=10, length=10, difficulty=2, seed=10,
             grid_resolution=3, recovery_strategy="none",
         )
 
@@ -30,7 +30,14 @@ class JsonExportTests(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 export_building_json(building, path)
 
-        self.assertEqual(data["building"]["floor_elevations"], list(range(5)))
+        self.assertEqual(data["building"]["floor_elevations"], list(range(4)))
+        self.assertEqual(
+            (data["building"]["floors"], data["building"]["length"],
+             data["building"]["width"]),
+            (4, 10, 10),
+        )
+        self.assertEqual(len(data["graph"]["nodes"]), 400)
+        self.assertEqual(len(data["routes"]), 19)
         self.assertEqual(data["schema_version"], 1)
         self.assertEqual(data["coordinate_system"]["blender_units_per_graph_unit"], 1.0)
         self.assertEqual(data["generation"]["grid_resolution"], 3)

@@ -88,6 +88,9 @@ def solve_wfc(
     tile_aware_connectivity: bool = False,
     endpoint_frontier: bool = False,
     candidate_lookahead: bool = False,
+    trace_callback: Callable[[Mapping[str, object]], None] | None = None,
+    trace_states: bool = False,
+    routing_strategy: str = "dfs_guided",
 ) -> dict[Cell, int]:
     """Solve a local tile layout with seeded random restarts.
 
@@ -130,9 +133,12 @@ def solve_wfc(
             tile_aware_connectivity,
             endpoint_frontier,
             candidate_lookahead,
+            trace_states,
         )
     ):
         raise ValueError("WFC heuristic options must be booleans")
+    if routing_strategy != "dfs_guided":
+        raise ValueError("solve_wfc supports only dfs_guided; use the bounded hybrid solver")
 
     fixed = dict(fixed_tiles or {})
     allowed = {
@@ -173,7 +179,35 @@ def solve_wfc(
     rng = random.Random(seed)
     last_failure: SolverFailureDetail | None = None
     phase_counts: Counter[str] = Counter()
+    collapse_counts: Counter[str] = Counter()
+    removed_by_mechanism: Counter[str] = Counter()
+    resolved_by_mechanism: dict[str, set[Cell]] = {
+        "local_propagation": set(),
+        "global_pruning": set(),
+    }
+    initial_pre_collapsed_cells: set[Cell] = set()
     cell_set = set(cell_list)
+    collapse_iteration = 0
+
+    def trace_state(event: str, **details: object) -> None:
+        if trace_callback is None:
+            return
+        event_data: dict[str, object] = {
+            "event": event,
+            **details,
+        }
+        if trace_states:
+            event_data["domains"] = tuple(
+                (cell, tuple(sorted(domain))) for cell, domain in domains.items()
+            )
+        trace_callback(event_data)
+
+    def domain_distribution() -> dict[int, int]:
+        distribution: Counter[int] = Counter(
+            len(domain) for domain in domains.values()
+        )
+        return dict(sorted(distribution.items()))
+
     for connection in connections:
         if not isinstance(connection, (tuple, list)) or len(connection) != 3:
             raise ValueError(
@@ -273,6 +307,25 @@ def solve_wfc(
                 if tile_list[tile_index].ports[opposite_direction] is kind
             }
 
+        if trace_callback is not None:
+            initial_pre_collapsed_cells.update(
+                cell for cell, domain in domains.items() if len(domain) == 1
+            )
+            trace_state(
+                "solver_attempt_start",
+                attempt=attempt_number,
+                initial_domain_size_distribution=domain_distribution(),
+                initial_pre_collapsed_cells=tuple(
+                    cell for cell, domain in domains.items() if len(domain) == 1
+                ),
+                initial_unresolved_cells=tuple(
+                    cell for cell, domain in domains.items() if len(domain) > 1
+                ),
+                initial_fixed_cell_count=sum(
+                    len(domain) == 1 for domain in domains.values()
+                ),
+            )
+
         empty_domain = next(
             (cell for cell, domain in domains.items() if not domain),
             None,
@@ -294,6 +347,40 @@ def solve_wfc(
 
         trigger_cell: Cell | None = None
 
+        def emit_reduction(
+            phase: str,
+            before_sizes: Mapping[Cell, int],
+        ) -> None:
+            if trace_callback is None:
+                return
+            mechanism = (
+                "global_pruning" if "pruning" in phase else "local_propagation"
+            )
+            removed = sum(
+                before_sizes[cell] - len(domains[cell]) for cell in domains
+            )
+            newly_resolved = {
+                cell for cell in domains
+                if before_sizes[cell] > 1 and len(domains[cell]) == 1
+            }
+            already_resolved = (
+                resolved_by_mechanism["local_propagation"]
+                | resolved_by_mechanism["global_pruning"]
+            )
+            removed_by_mechanism[mechanism] += removed
+            resolved_by_mechanism[mechanism].update(newly_resolved - already_resolved)
+            trace_state(
+                "domain_reduction",
+                phase=phase,
+                possibilities_removed=removed,
+                changed_cells=tuple(
+                    cell for cell in domains
+                    if before_sizes[cell] != len(domains[cell])
+                ),
+                newly_resolved_cells=tuple(sorted(newly_resolved)),
+                domain_size_distribution=domain_distribution(),
+            )
+
         def propagate_domains(
             changed_cells: Iterable[Cell],
             propagation_phase: str,
@@ -301,6 +388,11 @@ def solve_wfc(
         ) -> None:
             changed_list = tuple(changed_cells)
             phase_counts[propagation_phase] += 1
+            before_sizes = (
+                {cell: len(domain) for cell, domain in domains.items()}
+                if trace_callback is not None
+                else {}
+            )
             try:
                 propagate(domains, compatibility, changed_list)
             except ContradictionError as error:
@@ -315,8 +407,14 @@ def solve_wfc(
                     ),
                     phase_counts,
                 ) from error
+            emit_reduction(propagation_phase, before_sizes)
             while typed_pairs:
                 phase_counts[pruning_phase] += 1
+                before_sizes = (
+                    {cell: len(domain) for cell, domain in domains.items()}
+                    if trace_callback is not None
+                    else {}
+                )
                 try:
                     changed = prune_unreachable_route_domains(
                         domains,
@@ -337,9 +435,15 @@ def solve_wfc(
                         ),
                         phase_counts,
                     ) from error
+                emit_reduction(pruning_phase, before_sizes)
                 if not changed:
                     break
                 phase_counts[propagation_phase] += 1
+                before_sizes = (
+                    {cell: len(domain) for cell, domain in domains.items()}
+                    if trace_callback is not None
+                    else {}
+                )
                 try:
                     propagate(domains, compatibility, changed)
                 except ContradictionError as error:
@@ -354,6 +458,7 @@ def solve_wfc(
                         ),
                         phase_counts,
                     ) from error
+                emit_reduction(propagation_phase, before_sizes)
 
         try:
             propagate_domains(
@@ -398,21 +503,49 @@ def solve_wfc(
                             phase_counts,
                         )
                         raise failure from error
+                    if trace_callback is not None:
+                        trace_state(
+                            "solver_solution",
+                            attempt=attempt_number,
+                            collapse_counts=dict(collapse_counts),
+                            pre_collapsed_cells=tuple(
+                                sorted(initial_pre_collapsed_cells)
+                            ),
+                            unique_cells_resolved_by_local_propagation=len(
+                                resolved_by_mechanism["local_propagation"]
+                            ),
+                            unique_cells_resolved_by_global_pruning=len(
+                                resolved_by_mechanism["global_pruning"]
+                            ),
+                            possibilities_removed_by_local_propagation=(
+                                removed_by_mechanism["local_propagation"]
+                            ),
+                            possibilities_removed_by_global_pruning=(
+                                removed_by_mechanism["global_pruning"]
+                            ),
+                            solver_restarts=attempt_number - 1,
+                            solver_contradictions=phase_counts[
+                                "solver_contradictions"
+                            ],
+                            dfs_backtracks=phase_counts["dfs_backtracks"],
+                            dfs_search_budget_exhaustions=phase_counts[
+                                "dfs_search_budget_exhaustions"
+                            ],
+                        )
                     return result
 
+                collapse_iteration += 1
                 phase_counts["cell_collapse_selection"] += 1
                 try:
                     route_choice = _select_route_tile(
-                        domains,
-                        tile_list,
-                        typed_pairs,
-                        rng,
-                        required_horizontal_steps,
-                        compatibility=compatibility,
+                        domains, tile_list, typed_pairs, rng,
+                        required_horizontal_steps, compatibility=compatibility,
                         endpoint_frontier=endpoint_frontier,
                         candidate_lookahead=candidate_lookahead,
                         tile_aware_connectivity=tile_aware_connectivity,
                         phase_counts=phase_counts,
+                        trace_callback=trace_callback,
+                        attempt_number=attempt_number,
                     )
                 except ContradictionError as error:
                     failure_phase = (
@@ -434,6 +567,7 @@ def solve_wfc(
                     raise failure from error
                 if route_choice is not None:
                     selected_cell, selected_tile = route_choice
+                    selection_mode = "route-guided"
                 else:
                     preferred_cells = (
                         [
@@ -455,6 +589,7 @@ def solve_wfc(
                         ]
                         selected_cell = rng.choice(candidates)
                         selected_tile = preferred_tile_index
+                        selection_mode = "preferred-empty-tile"
                     else:
                         smallest_domain = min(
                             len(domains[cell]) for cell in unresolved
@@ -466,6 +601,56 @@ def solve_wfc(
                         ]
                         selected_cell = rng.choice(candidates)
                         selected_tile = rng.choice(sorted(domains[selected_cell]))
+                        selection_mode = "minimum-domain-size"
+                if trace_callback is not None:
+                    if selection_mode == "route-guided":
+                        collapse_counts["explicit_route_guided"] += 1
+                    elif selected_tile == preferred_tile_index:
+                        collapse_counts["explicit_empty_tile"] += 1
+                    else:
+                        collapse_counts["explicit_other"] += 1
+                    candidate_indices = tuple(sorted(domains[selected_cell]))
+                    trace_state(
+                        "collapse_selected",
+                        attempt=attempt_number,
+                        iteration=collapse_iteration,
+                        unresolved_cell_count=len(unresolved),
+                        selection_mode=selection_mode,
+                        selected_cell=selected_cell,
+                        original_domain_size=len(candidate_indices),
+                        candidate_tile_indices=candidate_indices,
+                        candidate_tile_names=tuple(
+                            tile_list[index].name for index in candidate_indices
+                        ),
+                        candidate_port_configurations=tuple(
+                            {
+                                tile_list[index].name: tuple(
+                                    (direction.name, port.value)
+                                    for direction, port
+                                    in tile_list[index].ports.items()
+                                )
+                            }
+                            for index in candidate_indices
+                        ),
+                        selected_tile_index=selected_tile,
+                        selected_tile_name=tile_list[selected_tile].name,
+                        selected_tile_ports=tuple(
+                            (direction.name, port.value)
+                            for direction, port
+                            in tile_list[selected_tile].ports.items()
+                        ),
+                        required_route_feasible=all(
+                            has_tile_supported_route(
+                                domains,
+                                tile_list,
+                                start,
+                                end,
+                                kind,
+                                required_horizontal_steps,
+                            )
+                            for start, end, kind in typed_pairs
+                        ),
+                    )
                 trigger_cell = selected_cell
                 domains[selected_cell] = {selected_tile}
                 try:
@@ -484,8 +669,41 @@ def solve_wfc(
                             for cell, domain in domains.items()
                         }
                     )
+                if trace_callback is not None:
+                    trace_state(
+                        "collapse_complete",
+                        attempt=attempt_number,
+                        iteration=collapse_iteration,
+                        selected_cell=selected_cell,
+                        selected_tile_index=selected_tile,
+                        selection_mode=selection_mode,
+                        unresolved_cell_count=sum(
+                            len(domain) > 1 for domain in domains.values()
+                        ),
+                        required_route_feasible=all(
+                            has_tile_supported_route(
+                                domains,
+                                tile_list,
+                                start,
+                                end,
+                                kind,
+                                required_horizontal_steps,
+                            )
+                            for start, end, kind in typed_pairs
+                        ),
+                    )
         except SolverContradiction as error:
             last_failure = error.failure
+            if trace_callback is not None:
+                phase_counts["solver_contradictions"] += 1
+                trace_state(
+                    "solver_contradiction",
+                    attempt=attempt_number,
+                    failure_phase=error.failure.phase,
+                    failure_message=error.failure.message,
+                    failure_cell=error.failure.cell,
+                    phase_counts=dict(phase_counts),
+                )
 
     if last_failure is None:
         last_failure = SolverFailureDetail(
@@ -516,8 +734,13 @@ def _select_route_tile(
     candidate_lookahead: bool = False,
     tile_aware_connectivity: bool = False,
     phase_counts: Counter[str],
+    trace_callback: Callable[[Mapping[str, object]], None] | None = None,
+    attempt_number: int = 1,
 ) -> tuple[Cell, int] | None:
     for start, end, kind in required_typed_pairs:
+        search_stats: dict[str, int | bool] | None = (
+            {} if trace_callback is not None else None
+        )
         path = _find_tile_supported_route(
             domains,
             tiles,
@@ -526,7 +749,13 @@ def _select_route_tile(
             kind,
             rng,
             required_horizontal_steps,
+            search_stats=search_stats,
         )
+        if search_stats is not None:
+            phase_counts["dfs_backtracks"] += int(search_stats.get("backtracks", 0))
+            phase_counts["dfs_search_budget_exhaustions"] += int(
+                bool(search_stats.get("budget_exhausted", False))
+            )
         if path is None:
             raise ContradictionError(
                 f"No tile-supported {kind.name.lower()} path from {start} to {end}",
@@ -534,6 +763,27 @@ def _select_route_tile(
                 domain=domains[start],
             )
         unresolved = [cell for cell in path if len(domains[cell]) > 1]
+        if trace_callback is not None:
+            trace_callback({
+                "event": "route_candidate",
+                "attempt": attempt_number,
+                "route_start": start,
+                "route_end": end,
+                "route_kind": kind.value,
+                "candidate_path": path,
+                "candidate_path_length": len(path),
+                "candidate_horizontal_steps": sum(
+                    _direction_between(path[index], path[index + 1])
+                    in (Direction.N, Direction.E, Direction.S, Direction.W)
+                    for index in range(len(path) - 1)
+                ),
+                "dfs_search_nodes": (search_stats or {}).get("nodes", 0),
+                "dfs_backtracks": (search_stats or {}).get("backtracks", 0),
+                "dfs_search_budget_exhausted": (search_stats or {}).get(
+                    "budget_exhausted", False
+                ),
+                "search_remains": len(unresolved) > 0,
+            })
         if not unresolved:
             continue
         if endpoint_frontier:
@@ -571,12 +821,32 @@ def _select_route_tile(
                 cell=cell,
                 domain=domains[cell],
             )
+        if trace_callback is not None:
+            trace_callback({
+                "event": "route_guided_selection",
+                "attempt": attempt_number,
+                "selected_cell": cell,
+                "original_domain_size": len(domains[cell]),
+                "candidate_count_before_dfs_filter": len(domains[cell]),
+                "candidate_count_after_dfs_filter": len(candidates_for_cell),
+                "candidate_tile_indices": tuple(sorted(candidates_for_cell)),
+                "candidate_tile_names": tuple(
+                    tiles[index].name for index in sorted(candidates_for_cell)
+                ),
+                "candidate_lookahead_enabled": candidate_lookahead,
+            })
         ordered_tile_candidates = sorted(candidates_for_cell)
         if not candidate_lookahead:
             return cell, rng.choice(ordered_tile_candidates)
 
-        rng.shuffle(ordered_tile_candidates)
+        if len(ordered_tile_candidates) == 1:
+            ordered_tile_candidates = [rng.choice(ordered_tile_candidates)]
+        else:
+            rng.shuffle(ordered_tile_candidates)
+        lookahead_checks = 0
+        lookahead_rejections = 0
         for tile_index in ordered_tile_candidates:
+            lookahead_checks += 1
             phase_counts["candidate_lookahead_checks"] += 1
             trial_domains = {
                 candidate_cell: set(domain)
@@ -608,12 +878,38 @@ def _select_route_tile(
                     )
                     for start, end, kind in required_typed_pairs
                 ):
+                    lookahead_rejections += 1
                     phase_counts["candidate_lookahead_rejections"] += 1
                     continue
             except ContradictionError:
+                lookahead_rejections += 1
                 phase_counts["candidate_lookahead_rejections"] += 1
                 continue
+            if trace_callback is not None:
+                trace_callback({
+                    "event": "candidate_lookahead_result",
+                    "attempt": attempt_number,
+                    "selected_cell": cell,
+                    "candidate_count_before": len(candidates_for_cell),
+                    "candidate_count_after": 1,
+                    "checks": lookahead_checks,
+                    "rejections": lookahead_rejections,
+                    "selected_tile_index": tile_index,
+                    "selected_tile_name": tiles[tile_index].name,
+                })
             return cell, tile_index
+        if trace_callback is not None:
+            trace_callback({
+                "event": "candidate_lookahead_result",
+                "attempt": attempt_number,
+                "selected_cell": cell,
+                "candidate_count_before": len(candidates_for_cell),
+                "candidate_count_after": 0,
+                "checks": lookahead_checks,
+                "rejections": lookahead_rejections,
+                "selected_tile_index": None,
+                "selected_tile_name": None,
+            })
         raise CandidateLookaheadError(
             f"One-step lookahead rejected every route tile at {cell}",
             cell=cell,
@@ -630,18 +926,26 @@ def _find_tile_supported_route(
     kind: PortKind,
     rng: random.Random,
     required_horizontal_steps: int = 0,
+    *,
+    search_stats: dict[str, int | bool] | None = None,
 ) -> tuple[Cell, ...] | None:
     forward, _ = _possible_route_adjacency(domains, tiles, kind)
     path = [start]
     visited = {start}
     search_budget = max(100, len(domains) * 24)
+    initial_budget = search_budget
+    nodes = 0
+    backtracks = 0
+    budget_exhausted = False
 
     def search(cell: Cell, horizontal_steps: int) -> bool:
-        nonlocal search_budget
+        nonlocal search_budget, nodes, backtracks, budget_exhausted
         if cell == end:
             return horizontal_steps >= required_horizontal_steps
+        nodes += 1
         search_budget -= 1
         if search_budget < 0:
+            budget_exhausted = True
             return False
 
         candidates = list(forward[cell] - visited)
@@ -697,9 +1001,19 @@ def _find_tile_supported_route(
                 return True
             path.pop()
             visited.remove(neighbor)
+            backtracks += 1
         return False
 
-    return tuple(path) if search(start, 0) else None
+    found = search(start, 0)
+    if search_stats is not None:
+        search_stats.update({
+            "nodes": nodes,
+            "backtracks": backtracks,
+            "budget": initial_budget,
+            "remaining_budget": search_budget,
+            "budget_exhausted": budget_exhausted,
+        })
+    return tuple(path) if found else None
 
 
 def _has_tile_with_route_ports(

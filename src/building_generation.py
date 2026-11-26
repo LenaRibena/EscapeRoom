@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from time import perf_counter
+from collections.abc import Callable, Mapping
 
 from src.route_diagnostics import diagnose_routes
 from src.wfc_building import RouteGenerationError, WFCBuilding
@@ -50,6 +51,7 @@ def generate_building(
     *,
     seed: int = 0,
     max_building_retries: int = 0,
+    trace_callback: Callable[[Mapping[str, object]], None] | None = None,
     **options,
 ) -> BuildingGenerationResult:
     """Generate a validated building, optionally retrying geometric failures.
@@ -65,10 +67,18 @@ def generate_building(
         raise ValueError("generate_building always generates routes")
     if "forbidden_cells" in options:
         options["forbidden_cells"] = tuple(options["forbidden_cells"])
+    if trace_callback is not None:
+        options["trace_callback"] = trace_callback
 
     attempts = []
     for index in range(max_building_retries + 1):
         candidate_seed = _candidate_seed(seed, index)
+        if trace_callback is not None:
+            trace_callback({
+                "event": "building_attempt_start",
+                "building_attempt": index + 1,
+                "candidate_seed": candidate_seed,
+            })
         graph_start = perf_counter()
         try:
             building = WFCBuilding(
@@ -81,6 +91,16 @@ def generate_building(
                     str(error), perf_counter() - graph_start, 0.0, 0, {},
                 ))
                 error.building_attempts = tuple(attempts)
+            if trace_callback is not None:
+                trace_callback({
+                    "event": "building_attempt_failure",
+                    "building_attempt": index + 1,
+                    "candidate_seed": candidate_seed,
+                    "stage": "graph-generation",
+                    "classification": "graph-generation",
+                    "error": str(error),
+                    "wfc_attempts": 0,
+                })
             raise
         graph_seconds = perf_counter() - graph_start
         route_start = perf_counter()
@@ -104,6 +124,17 @@ def generate_building(
                 graph_seconds, perf_counter() - route_start,
                 building.total_wfc_attempts, dict(error.failure_details),
             ))
+            if trace_callback is not None:
+                trace_callback({
+                    "event": "building_attempt_failure",
+                    "building_attempt": index + 1,
+                    "candidate_seed": candidate_seed,
+                    "stage": stage,
+                    "classification": error.failure_classification,
+                    "error": str(error),
+                    "wfc_attempts": building.total_wfc_attempts,
+                    "route_count": len(building.routes),
+                })
             if not geometric or max_building_retries == 0:
                 if max_building_retries:
                     error.building_attempts = tuple(attempts)
@@ -122,6 +153,16 @@ def generate_building(
                 str(error), graph_seconds, perf_counter() - route_start,
                 building.total_wfc_attempts, dict(error.failure_details),
             ))
+            if trace_callback is not None:
+                trace_callback({
+                    "event": "building_attempt_failure",
+                    "building_attempt": index + 1,
+                    "candidate_seed": candidate_seed,
+                    "stage": "geometry-validation",
+                    "classification": error.failure_classification,
+                    "error": str(error),
+                    "wfc_attempts": building.total_wfc_attempts,
+                })
             if (max_building_retries == 0 or error.failure_classification not in {
                 "geometry_collision", "geometric_rejection", "occupancy_conflict"
             }):
@@ -142,6 +183,17 @@ def generate_building(
             candidate_seed, "accepted", "", "", graph_seconds,
             perf_counter() - route_start, building.total_wfc_attempts, {},
         ))
+        if trace_callback is not None:
+            trace_callback({
+                "event": "building_attempt_accepted",
+                "building_attempt": index + 1,
+                "candidate_seed": candidate_seed,
+                "wfc_attempts": building.total_wfc_attempts,
+                "route_count": len(building.routes),
+                "building_retries_used": index,
+                "global_route_recovery_attempts": building.recovery_attempts,
+                "individual_route_retries": building.routes_retried,
+            })
         building.requested_seed = seed
         building.accepted_seed = candidate_seed
         building.building_retry_count = index

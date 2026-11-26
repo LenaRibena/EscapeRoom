@@ -17,9 +17,9 @@ def main() -> None:
     args = parser.parse_args()
 
     options = dict(
-        floors=5,
-        width=5,
-        length=5,
+        floors=4,
+        width=10,
+        length=10,
         difficulty=2,
         seed=args.seed,
         grid_resolution=args.grid_resolution,

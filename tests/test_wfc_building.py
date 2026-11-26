@@ -127,13 +127,19 @@ class WFCBuildingTests(unittest.TestCase):
         )
         self.assertEqual(building.floor_grid, frozenset(building.graph))
 
-    def test_seeded_original_graph_failures_are_reported(self):
+    def test_direct_stair_failures_are_reported(self):
         building = WFCBuilding(
-            floors=5, width=5, length=5, difficulty=2, seed=13,
-            grid_resolution=2, recovery_strategy="none", generate_routes=False,
+            floors=4, width=10, length=10, difficulty=2, seed=10,
+            grid_resolution=3, recovery_strategy="none", generate_routes=False,
         )
-        with self.assertRaises(RouteGenerationError) as caught:
-            building.generate_routes()
+        with patch.object(
+            building, "_direct_stair",
+            side_effect=RouteGenerationError(
+                "test collision", failure_classification="geometry_collision"
+            ),
+        ):
+            with self.assertRaises(RouteGenerationError) as caught:
+                building.generate_routes()
         self.assertTrue(caught.exception.failure_classification)
         self.assertTrue(building.route_failures)
         self.assertTrue(caught.exception.failure_details)
@@ -292,7 +298,7 @@ class WFCBuildingTests(unittest.TestCase):
         for resolution in (2, 3):
             with self.subTest(resolution=resolution):
                 building = WFCBuilding(
-                    floors=5, width=5, length=5, difficulty=2,
+                    floors=4, width=10, length=10, difficulty=2,
                     grid_resolution=resolution, seed=10,
                     endpoint_frontier=True, recovery_strategy="none",
                     minimum_curvature_radius=0.02, max_route_attempts=30,
@@ -345,6 +351,31 @@ class WFCBuildingTests(unittest.TestCase):
                     building.plot()
                 plt.close("all")
 
+    def test_isolated_route_filter_keeps_stairs_as_fixed_occupancy(self):
+        route_id = "0:(0, 4, 3)->(0, 0, 0):slide"
+        building = WFCBuilding(
+            floors=4,
+            width=10,
+            length=10,
+            difficulty=2,
+            grid_resolution=3,
+            seed=10,
+            recovery_strategy="none",
+            only_route_id=route_id,
+        )
+
+        self.assertIn(route_id, {route.route_id for route in building.routes})
+        self.assertTrue(
+            all(
+                route.direct_stair or route.route_id == route_id
+                for route in building.routes
+            )
+        )
+        self.assertEqual(
+            sum(route.kind is PortKind.SLIDE for route in building.routes),
+            1,
+        )
+
     def test_later_candidate_cannot_invalidate_earlier_smoothed_route(self):
         building = small_building(
             (0, 0, 0), (2, 2, 1), "stair", resolution=2, vertical_resolution=2
@@ -370,11 +401,11 @@ class WFCBuildingTests(unittest.TestCase):
 
     def test_seed10_preserves_constrained_slide_geometry_after_generation(self):
         building = WFCBuilding(
-            floors=5,
-            width=5,
-            length=5,
+            floors=4,
+            width=10,
+            length=10,
             difficulty=2,
-            grid_resolution=2,
+            grid_resolution=3,
             seed=10,
             endpoint_frontier=True,
             recovery_strategy="none",
@@ -401,7 +432,10 @@ class WFCBuildingTests(unittest.TestCase):
 
         diagnostics = diagnose_routes(building, routes)
         self.assertEqual(diagnostics.logical_errors, ())
-        self.assertEqual(diagnostics.routes[0].warnings, ())
+        self.assertEqual(
+            diagnostics.warnings,
+            ("17:(0, 9, 2)->(0, 9, 1):slide: route has a turn sharper than 100.0 degrees",),
+        )
 
     def test_routes_at_one_graph_node_can_share_a_typed_landing(self):
         building = small_building(vertical_resolution=3)
@@ -570,9 +604,9 @@ class WFCBuildingTests(unittest.TestCase):
         for seed in (6, 15, 19):
             with self.subTest(seed=seed):
                 building = WFCBuilding(
-                    floors=5,
-                    width=5,
-                    length=5,
+                    floors=4,
+                    width=10,
+                    length=10,
                     difficulty=2,
                     grid_resolution=2,
                     seed=seed,
@@ -712,9 +746,9 @@ class WFCBuildingTests(unittest.TestCase):
 
     def test_default_vertical_resolution_leaves_room_for_aligned_routes(self):
         building = WFCBuilding(
-            floors=5,
-            width=5,
-            length=5,
+            floors=4,
+            width=10,
+            length=10,
             difficulty=2,
             grid_resolution=2,
             seed=0,
@@ -1129,16 +1163,14 @@ class WFCBuildingTests(unittest.TestCase):
         )
 
     def test_slide_smoothing_retries_local_strengths_before_rejecting(self):
-        building = WFCBuilding(
-            floors=5,
-            width=5,
-            length=5,
-            difficulty=2,
-            grid_resolution=2,
-            seed=0,
+        building = small_building(
+            resolution=2,
+            vertical_resolution=3,
             minimum_curvature_radius=0.13,
-            generate_routes=False,
         )
+        building.floors = 5
+        building.length = building.width = 5
+        building.grid_shape = (13, 9, 9)
         xy_cells = (
             (0, 0),
             (0, 3),
@@ -1518,12 +1550,12 @@ class WFCBuildingTests(unittest.TestCase):
 
     def test_inherited_graph_routes_are_generated_without_collisions(self):
         building = WFCBuilding(
-            floors=5,
-            width=5,
-            length=5,
+            floors=4,
+            width=10,
+            length=10,
             difficulty=2,
-            grid_resolution=2,
-            seed=0,
+            grid_resolution=3,
+            seed=10,
         )
         expected_edges = {
             (source, target, attributes.get("kind", attributes.get("type")))

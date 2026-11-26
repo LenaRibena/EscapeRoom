@@ -1,0 +1,59 @@
+{
+  "description": "Accepted seed-10 relative-budget geometry-aware hybrid WFC building",
+  "schema_version": 1,
+  "graph_seed": 10,
+  "routing_seed": 10,
+  "dimensions": [4, 10, 10],
+  "difficulty": 2,
+  "grid_resolution": 3,
+  "vertical_grid_resolution": 3,
+  "routing_strategy": "hybrid",
+  "weighting": "compact",
+  "compactness_strength": 0.12,
+  "geometry_preference": 1.5,
+  "geometry_backtracking": true,
+  "relative_budget": {
+    "reference": "directed port-compatible shortest walk lower bound, allowing revisits and relaxed simultaneous assignments",
+    "detour_fraction": 0.25,
+    "detour_cap_cells": 4,
+    "formula": "lower_bound_cells + min(4, ceil(0.25 * (lower_bound_cells - 1)))"
+  },
+  "minimum_centerline_clearance_graph_units": 0.25,
+  "shared_endpoint_exclusion_radius_graph_units": 0.25,
+  "minimum_curvature_radius": 0.02,
+  "route_attempts": 3,
+  "maximum_alternative_backtracks_per_solve": 8,
+  "untraced_max_seconds_per_solve": 10,
+  "traced_max_seconds_per_solve": 60,
+  "traced_route_id": "0:(0, 4, 3)->(0, 0, 0):slide",
+  "traced_explicit_choices": 21,
+  "traced_non_forced_choices": 18,
+  "traced_backtracks": 0,
+  "independent_diagnostics": {
+    "routes": 19,
+    "route_pairs": 171,
+    "logical_errors": 0,
+    "warnings": 0,
+    "minimum_centerline_clearance": 0.5679793828224292
+  },
+  "sha256": {
+    "building/building_seed10_hybrid.json": "dac79b23be631eb5611cfdf295107f8c2658cd77a523c11166743b804948ff0c",
+    "building/building_seed10_hybrid.png": "8812bac3749b41803c3f7045329bae5df2a2a93b38541c4110705459933c6005",
+    "algorithm/wfc_decisions.gif": "92c3d2b3571c74875f9fbebeb03cfc51bf6c3f0a2fe9bb12d72d8758fa14b58b",
+    "algorithm/wfc_decisions.txt": "c39343e816d571daa91b4c23319692fb30261d5be2eee5a47cfeb0e40477e0d7",
+    "algorithm/wfc_decisions_explained.txt": "4fbc1ab19dce94ffc8b40e591b69f2ff5a76becf484a28877d5e9e4585004aa0"
+  },
+  "provenance": {
+    "original_traced_record_sha256": "016cddde3c17a0fef98772dbbe0f4ea8cfe95805ba7ee8b9970349cb16478ef9",
+    "dfs_baseline_json_sha256": "67c4a5161ececea97e5b0214ab7df9a71ff07e640d4694390015561878b9f345",
+    "graph_source_sha256": "959ffdd145ca3136e44dda75c737af472b34f565f46904e3b32f18e03ac51070"
+  },
+  "environment": {
+    "python": "3.13.11",
+    "numpy": "2.4.2",
+    "networkx": "3.7",
+    "matplotlib": "3.10.8",
+    "pillow": "12.1.0",
+    "pythonhashseed": "0"
+  }
+}

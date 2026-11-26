@@ -11,34 +11,31 @@ from src.wfc_building import RouteGenerationError, WFCBuilding
 
 
 class BuildingRegenerationTests(unittest.TestCase):
-    def test_seed5_regeneration_is_deterministic_and_exported(self):
-        options = dict(floors=5, width=5, length=5, difficulty=2, seed=5,
-                       grid_resolution=2, recovery_strategy="none",
+    def test_seed10_regeneration_is_deterministic_and_exported(self):
+        options = dict(floors=4, width=10, length=10, difficulty=2, seed=10,
+                       grid_resolution=3, recovery_strategy="none",
                        max_building_retries=3)
         first = generate_building(**options)
         second = generate_building(**options)
         self.assertEqual([a.candidate_seed for a in first.attempts],
                          [a.candidate_seed for a in second.attempts])
-        self.assertIn(
-            first.attempts[0].stage,
-            {"direct-stair", "slide-routing", "geometry-validation"},
-        )
+        self.assertEqual(first.attempts[0].stage, "accepted")
         self.assertEqual(
             first.building.building_retry_count,
             len(first.attempts) - 1,
         )
         accepted_index = first.building.building_retry_count
-        self.assertEqual(first.building.requested_seed, 5)
+        self.assertEqual(first.building.requested_seed, 10)
         self.assertEqual(
-            first.building.accepted_seed, _candidate_seed(5, accepted_index)
+            first.building.accepted_seed, _candidate_seed(10, accepted_index)
         )
         first_json = building_to_dict(first.building)
         self.assertEqual(first_json, building_to_dict(second.building))
-        self.assertEqual(first_json["generation"]["seed"], 5)
-        self.assertEqual(first_json["generation"]["requested_seed"], 5)
+        self.assertEqual(first_json["generation"]["seed"], 10)
+        self.assertEqual(first_json["generation"]["requested_seed"], 10)
         self.assertEqual(
             first_json["generation"]["accepted_seed"],
-            _candidate_seed(5, accepted_index),
+            _candidate_seed(10, accepted_index),
         )
         self.assertEqual(
             first_json["generation"]["building_retry_count"], accepted_index
@@ -46,16 +43,16 @@ class BuildingRegenerationTests(unittest.TestCase):
         self.assertEqual([r["geometry"] for r in first_json["routes"]],
                          [r.accepted_geometry for r in first.building.routes])
         reproduced = WFCBuilding(
-            floors=5, width=5, length=5, difficulty=2, seed=first.building.accepted_seed,
-            grid_resolution=2, recovery_strategy="none",
+            floors=4, width=10, length=10, difficulty=2, seed=first.building.accepted_seed,
+            grid_resolution=3, recovery_strategy="none",
         )
         reproduced_json = building_to_dict(reproduced)
         self.assertEqual(first_json["graph"], reproduced_json["graph"])
         self.assertEqual(first_json["routes"], reproduced_json["routes"])
 
     def test_zero_retries_preserves_original_seeded_building(self):
-        options = dict(floors=5, width=5, length=5, difficulty=2, seed=10,
-                       grid_resolution=2, recovery_strategy="none")
+        options = dict(floors=4, width=10, length=10, difficulty=2, seed=10,
+                       grid_resolution=3, recovery_strategy="none")
         direct = WFCBuilding(**options)
         result = generate_building(**options)
         self.assertEqual(building_to_dict(direct), building_to_dict(result.building))

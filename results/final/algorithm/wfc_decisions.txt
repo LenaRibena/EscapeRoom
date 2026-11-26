@@ -1,0 +1,169 @@
+Accepted slide, length-bounded hybrid.
+Coordinates: (vertical grid layer, x, y). The bound uses the committed
+prefix, horizontal-travel requirement, directed motion and local/global
+propagation. Passing is a necessary feasibility check, not a proof of
+a complete route. No DFS path determines the sampled tile.
+Budget: 26 cells; accepted: 26 cells.
+Backtracks in this accepted execution: 0.
+
+Choice 1 | cell (8, 0, 12) | slide_descending_S_U | 4 eligible | sampled 28.0%
+  Candidate weights and probabilities:
+    slide_descending_N_U: weight 0.071361; probability 22.01%
+    slide_descending_E_U: weight 0.071361; probability 22.01%
+    slide_descending_S_U: weight 0.090718; probability 27.99%
+    slide_straight_U_D: weight 0.090718; probability 27.99%
+  Rejected: none
+  After selection: local -14; global -0 tile possibilities.
+
+Choice 2 | cell (8, 0, 11) | slide_straight_N_S | 3 eligible | sampled 49.0%
+  Candidate weights and probabilities:
+    slide_turn_N_E: weight 0.004006; probability 1.92%
+    slide_straight_N_S: weight 0.102284; probability 49.04%
+    slide_descending_N_D: weight 0.102284; probability 49.04%
+  Rejected: none
+  After selection: local -12; global -0 tile possibilities.
+
+Choice 3 | cell (8, 0, 10) | slide_descending_N_D | 3 eligible | sampled 48.0%
+  Candidate weights and probabilities:
+    slide_turn_N_E: weight 0.009562; probability 3.98%
+    slide_straight_N_S: weight 0.115325; probability 48.01%
+    slide_descending_N_D: weight 0.115325; probability 48.01%
+  Rejected: none
+  After selection: local -3684; global -7284 tile possibilities.
+
+Choice 4 | cell (7, 0, 10) | slide_descending_S_U | 4 eligible | sampled 47.9%
+  Candidate weights and probabilities:
+    slide_descending_N_U: weight 0.000537; probability 0.20%
+    slide_descending_E_U: weight 0.010781; probability 3.97%
+    slide_descending_S_U: weight 0.130029; probability 47.91%
+    slide_straight_U_D: weight 0.130029; probability 47.91%
+  Rejected: none
+  After selection: local -14; global -0 tile possibilities.
+
+Choice 5 | cell (7, 0, 9) | slide_straight_N_S | 2 eligible | sampled 90.4%
+  Candidate weights and probabilities:
+    slide_turn_N_E: weight 0.015608; probability 9.62%
+    slide_straight_N_S: weight 0.146607; probability 90.38%
+  Rejected: none
+  After selection: local -8; global -0 tile possibilities.
+
+Choice 6 | cell (7, 0, 8) | slide_descending_N_D | 3 eligible | sampled 47.2%
+  Candidate weights and probabilities:
+    slide_turn_N_E: weight 0.019941; probability 5.69%
+    slide_straight_N_S: weight 0.165299; probability 47.16%
+    slide_descending_N_D: weight 0.165299; probability 47.16%
+  Rejected: none
+  After selection: local -3345; global -7641 tile possibilities.
+
+Choice 7 | cell (5, 0, 8) | slide_straight_U_D | 4 eligible | sampled 47.0%
+  Candidate weights and probabilities:
+    slide_descending_N_U: weight 0.001262; probability 0.28%
+    slide_descending_E_U: weight 0.025349; probability 5.67%
+    slide_descending_S_U: weight 0.210136; probability 47.02%
+    slide_straight_U_D: weight 0.210136; probability 47.02%
+  Rejected: none
+  After selection: local -3691; global -7312 tile possibilities.
+
+Choice 8 | cell (4, 0, 8) | slide_descending_S_U | 4 eligible | sampled 47.0%
+  Candidate weights and probabilities:
+    slide_descending_N_U: weight 0.001423; probability 0.28%
+    slide_descending_E_U: weight 0.028581; probability 5.67%
+    slide_descending_S_U: weight 0.236928; probability 47.02%
+    slide_straight_U_D: weight 0.236928; probability 47.02%
+  Rejected: none
+  After selection: local -15; global -0 tile possibilities.
+
+Choice 9 | cell (4, 0, 7) | slide_straight_N_S | 3 eligible | sampled 46.9%
+  Candidate weights and probabilities:
+    slide_turn_N_E: weight 0.034735; probability 6.10%
+    slide_straight_N_S: weight 0.267135; probability 46.95%
+    slide_descending_N_D: weight 0.267135; probability 46.95%
+  Rejected: none
+  After selection: local -11; global -0 tile possibilities.
+
+Choice 10 | cell (4, 0, 6) | slide_straight_N_S | 2 eligible | sampled 88.0%
+  Candidate weights and probabilities:
+    slide_turn_N_E: weight 0.041172; probability 12.03%
+    slide_straight_N_S: weight 0.301194; probability 87.97%
+  Rejected: none
+  After selection: local -8; global -0 tile possibilities.
+
+Choice 11 | cell (4, 0, 5) | slide_straight_N_S | 3 eligible | sampled 46.7%
+  Candidate weights and probabilities:
+    slide_turn_N_E: weight 0.048109; probability 6.61%
+    slide_straight_N_S: weight 0.339596; probability 46.69%
+    slide_descending_N_D: weight 0.339596; probability 46.69%
+  Rejected: none
+  After selection: local -13; global -0 tile possibilities.
+
+Choice 12 | cell (4, 0, 4) | slide_descending_N_D | 3 eligible | sampled 46.6%
+  Candidate weights and probabilities:
+    slide_turn_N_E: weight 0.055715; probability 6.78%
+    slide_straight_N_S: weight 0.382893; probability 46.61%
+    slide_descending_N_D: weight 0.382893; probability 46.61%
+  Rejected: none
+  After selection: local -3335; global -7601 tile possibilities.
+
+Choice 13 | cell (2, 0, 4) | slide_straight_U_D | 4 eligible | sampled 46.5%
+  Candidate weights and probabilities:
+    slide_descending_N_U: weight 0.003526; probability 0.34%
+    slide_descending_E_U: weight 0.070828; probability 6.76%
+    slide_descending_S_U: weight 0.486752; probability 46.45%
+    slide_straight_U_D: weight 0.486752; probability 46.45%
+  Rejected: none
+  After selection: local -3003; global -7302 tile possibilities.
+
+Choice 14 | cell (1, 0, 4) | slide_descending_E_U | 3 eligible | sampled 12.6%
+  Candidate weights and probabilities:
+    slide_descending_N_U: weight 0.003976; probability 0.63%
+    slide_descending_E_U: weight 0.079858; probability 12.62%
+    slide_descending_S_U: weight 0.548812; probability 86.75%
+  Rejected: none
+  After selection: local -8; global -0 tile possibilities.
+
+Choice 15 | cell (1, 1, 4) | slide_straight_E_W | 3 eligible | sampled 89.8%
+  Candidate weights and probabilities:
+    slide_turn_N_W: weight 0.019063; probability 4.47%
+    slide_straight_E_W: weight 0.382893; probability 89.84%
+    slide_turn_S_W: weight 0.024234; probability 5.69%
+  Rejected: none
+  After selection: local -10; global -0 tile possibilities.
+
+Choice 16 | cell (1, 2, 4) | slide_turn_S_W | 1 eligible | sampled 100.0%
+  Candidate weights and probabilities:
+    slide_turn_S_W: weight 0.045502; probability 100.00%
+  Rejected: slide_turn_N_W (length_lower_bound), slide_straight_E_W (length_lower_bound)
+  After selection: local -10; global -0 tile possibilities.
+
+Choice 17 | cell (1, 2, 3) | slide_straight_N_S | 2 eligible | sampled 95.3%
+  Candidate weights and probabilities:
+    slide_straight_N_S: weight 0.486752; probability 95.26%
+    slide_turn_N_W: weight 0.024234; probability 4.74%
+  Rejected: slide_turn_N_E (length_lower_bound)
+  After selection: local -9; global -0 tile possibilities.
+
+Choice 18 | cell (1, 2, 2) | slide_straight_N_S | 2 eligible | sampled 90.5%
+  Candidate weights and probabilities:
+    slide_straight_N_S: weight 0.548812; probability 90.47%
+    slide_turn_N_W: weight 0.057844; probability 9.53%
+  Rejected: slide_turn_N_E (length_lower_bound)
+  After selection: local -10; global -0 tile possibilities.
+
+Choice 19 | cell (1, 2, 1) | slide_straight_N_S | 2 eligible | sampled 88.1%
+  Candidate weights and probabilities:
+    slide_straight_N_S: weight 0.618783; probability 88.08%
+    slide_turn_N_W: weight 0.083743; probability 11.92%
+  Rejected: slide_turn_N_E (length_lower_bound)
+  After selection: local -8; global -0 tile possibilities.
+
+Choice 20 | cell (1, 2, 0) | slide_turn_N_W | 1 eligible | sampled 100.0%
+  Candidate weights and probabilities:
+    slide_turn_N_W: weight 0.106992; probability 100.00%
+  Rejected: slide_turn_N_E (length_lower_bound)
+  After selection: local -4; global -4245 tile possibilities.
+
+Choice 21 | cell (1, 1, 0) | slide_straight_E_W | 1 eligible | sampled 100.0%
+  Candidate weights and probabilities:
+    slide_straight_E_W: weight 0.786628; probability 100.00%
+  Rejected: slide_turn_N_E (length_lower_bound)
+  After selection: local -5; global -10 tile possibilities.
