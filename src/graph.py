@@ -2,26 +2,17 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 
+from scipy.stats import gamma
+
 class Building(object):
-    def __init__(self, 
-                 floors: int, 
-                 width: int, 
-                 length: int,
+    def __init__(self,
                  difficulty: int = 3,
                  verbose: bool = False) -> None:
-        assert isinstance(floors, int) and floors > 0, "floors must be positive"
-        assert isinstance(width, int) and width > 0, "width must be positive"
-        assert isinstance(length, int) and length > 0, "length must be positive"
         assert isinstance(difficulty, int) and difficulty in np.arange(1, 11), "difficulty should be between 1 and 10"
         
-        self.floors = floors
-        self.width = width
-        self.length = length
-        
+        self.configure_difficulty(difficulty)
         self.start_pos = (self.length-1, self.width-1, self.floors-1)
         self.exit_pos = (0, 0, 0)
-        
-        self.configure_difficulty(difficulty)
         
         invalid_graph = True
         while invalid_graph:
@@ -79,10 +70,15 @@ class Building(object):
             print("Level created")
 
     def configure_difficulty(self, difficulty: int) -> None:
+        self.floors = 4
+        self.width = 10
+        self.length = 10
         volume = self.length * self.width * self.floors # TODO: Length, width and floors could be adjusted by difficulty
+
+        # TODO: According to Dimitra, the floors should by square
         self.min_edges = 5 * difficulty
         self.max_edges = self.min_edges + 10
-        self.non_solution_edges = 50
+        self.non_solution_edges = 100
         self.p_intra_sol = 0.9
         self.p_inter_sol = 0.1
         self.p_intra_pop = 0.99
@@ -208,12 +204,12 @@ class Building(object):
                 break
             
             # (Re)-normalize the weights
-            all_weights = all_weights / np.sum(all_weights)
+            normalized_weights = all_weights / np.sum(all_weights)
             node_type = nx.get_node_attributes(graph, "type")
             node_dead_end = nx.get_node_attributes(graph, "dead_end")
             
             # Categorically sample a node from all connected nodes
-            node_idx = np.random.choice(np.arange(len(all_valid_nodes)), size = 1, p = all_weights)
+            node_idx = np.random.choice(np.arange(len(all_valid_nodes)), size = 1, p = normalized_weights)
             node = all_valid_nodes[node_idx.item()]
             
             # We can only ascend/descend on dead ends which are not stair/slide heads/tails
@@ -439,9 +435,8 @@ class Building(object):
         plt.show()
 
 if __name__ == "__main__":
-    n, x, y = 3, 5, 5 # sys.argv[1:4]
     diff = 2
-    building = Building(n, x, y, difficulty=diff, verbose = True)
+    building = Building(difficulty=diff, verbose = True)
     
     # TODO: Quantitatively evaluate e.g
     # 1) Number of off-roads and how long they are for different difficulty settings
