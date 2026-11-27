@@ -23,11 +23,11 @@ FINAL = ROOT / "results" / "final"
 
 
 class FinalResultsTests(unittest.TestCase):
-    def test_hybrid_runner_rejects_dfs_and_missing_budget(self):
+    def test_hybrid_runner_rejects_unsupported_strategy_and_missing_budget(self):
         with tempfile.TemporaryDirectory() as directory:
             output = str(Path(directory) / "record.json")
             for arguments, expected in (
-                (["--strategy", "dfs_guided", "--relative-budget"], "invalid choice"),
+                (["--strategy", "unsupported", "--relative-budget"], "invalid choice"),
                 (["--strategy", "hybrid"], "requires --relative-budget or --max-cells"),
             ):
                 with self.subTest(arguments=arguments):
