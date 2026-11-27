@@ -41,7 +41,8 @@
     "building/building_seed10_hybrid.png": "8812bac3749b41803c3f7045329bae5df2a2a93b38541c4110705459933c6005",
     "algorithm/wfc_decisions.txt": "c39343e816d571daa91b4c23319692fb30261d5be2eee5a47cfeb0e40477e0d7",
     "algorithm/wfc_decisions_explained.txt": "bde12f84826e354e42233af56cd29365c9c087184ddb685a712a879e0ace1dbe",
-    "baseline/building_seed10_res3.json": "1a8a5409c36fa6950c978d52b84b71ede618e200bc4134c502d4de8bb1751756"
+    "algorithm/slide_generation.gif": "98a5ca7bcff9f74368b3918daf780c046ee97cddb6e4f8ad44efa33a2b4f4744",
+    "algorithm/slide_generation.png": "99f715f036ceb3151246a246338a26ed79473ca9895f91dc07df9597d4ea4d2e"
   },
   "provenance": {
     "original_traced_record_sha256": "016cddde3c17a0fef98772dbbe0f4ea8cfe95805ba7ee8b9970349cb16478ef9",

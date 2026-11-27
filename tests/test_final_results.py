@@ -8,9 +8,11 @@ from unittest.mock import patch
 
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image, ImageChops
 
 from examples.hybrid_building_visualize import create_figure
 from examples.hybrid_length_trace import main as write_decision_trace
+from examples.hybrid_slide_animation import load_choices
 from examples.explain_hybrid_decisions import score, turn_description
 
 
@@ -42,7 +44,40 @@ class FinalResultsTests(unittest.TestCase):
         self.assertEqual(len(counts), 21)
         self.assertEqual(sum(count > 1 for count in counts), 18)
         self.assertIn("Backtracks in this accepted execution: 0.", text)
-        self.assertFalse((FINAL / "algorithm" / "wfc_decisions.gif").exists())
+
+    def test_slide_animation_matches_recorded_choices(self):
+        choices, path = load_choices(
+            FINAL / "algorithm" / "wfc_decisions_explained.txt",
+            FINAL / "algorithm" / "wfc_decisions.txt",
+            FINAL / "building" / "building_seed10_hybrid.json",
+        )
+        self.assertEqual(len(choices), 21)
+        self.assertEqual(len(path), 26)
+        self.assertEqual(path[0], (9, 0, 12))
+        self.assertEqual(path[-1], (0, 0, 0))
+        self.assertEqual(choices[13].successor, (1, 1, 4))
+        self.assertEqual(choices[13].candidates[1][1], 12.62)
+        with Image.open(FINAL / "algorithm" / "slide_generation.gif") as image:
+            self.assertEqual(image.n_frames, len(choices))
+            self.assertEqual(image.size, (1200, 600))
+            first = image.convert("RGB")
+            image.seek(image.n_frames - 1)
+            last = image.convert("RGB")
+            self.assertIsNotNone(ImageChops.difference(first, last).getbbox())
+        with Image.open(FINAL / "algorithm" / "slide_generation.png") as image:
+            self.assertEqual(image.size, (1200, 600))
+
+    def test_slide_animation_rejects_mismatched_traces(self):
+        with tempfile.TemporaryDirectory() as directory:
+            summary = Path(directory) / "decisions.txt"
+            original = (FINAL / "algorithm" / "wfc_decisions.txt").read_text(
+                encoding="utf-8"
+            )
+            summary.write_text(original.replace("Choice 1 |", "Choice 2 |", 1),
+                               encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "differs between traces"):
+                load_choices(FINAL / "algorithm" / "wfc_decisions_explained.txt",
+                             summary, FINAL / "building" / "building_seed10_hybrid.json")
 
     def test_explained_trace_covers_each_choice(self):
         explained = (FINAL / "algorithm" / "wfc_decisions_explained.txt").read_text(
@@ -103,6 +138,29 @@ class FinalResultsTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "does not match"):
                     write_decision_trace()
             self.assertFalse((root / "output").exists())
+
+    def test_trace_writer_outputs_recorded_decision(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            record = root / "record.json"
+            record.write_text(json.dumps({
+                "routes": [{"id": "slide", "discrete_cells": 2}],
+                "backtracks": 0,
+                "events": [
+                    {"event": "hybrid_length_choice", "iteration": 1,
+                     "max_cells": 2, "selected_cell": [0, 0, 0],
+                     "selected_tile_index": 0, "selected_tile_name": "empty",
+                     "eligible": [[0, "empty", 1.0, 1.0]], "rejected": []},
+                    {"event": "hybrid_length_propagation", "iteration": 1,
+                     "domains": [], "local_removed": 0, "global_removed": 0},
+                ],
+            }), encoding="utf-8")
+            with patch("sys.argv", ["trace", str(record), "--output", str(root / "output")]):
+                write_decision_trace()
+            text = (root / "output" / "decisions.txt").read_text(encoding="utf-8")
+            self.assertIn("Budget: 2 cells; accepted: 2 cells.", text)
+            self.assertIn("Choice 1 | cell (0, 0, 0)", text)
+            self.assertFalse((root / "output" / "decisions.gif").exists())
 
 
 if __name__ == "__main__":

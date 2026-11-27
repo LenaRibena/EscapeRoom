@@ -38,6 +38,7 @@ def main():
         raise ValueError("Incomplete recorded decisions")
     if any("domains" not in propagated[event["iteration"]] for event in choices):
         raise ValueError("Recorded domain snapshots are required")
+    route = routes[0]
     args.output.mkdir(parents=True, exist_ok=True)
     tiles = build_route_tiles(PortKind.SLIDE)
     lines = [

@@ -14,16 +14,16 @@ execution for slide `(0, 4, 3) -> (0, 0, 0)`: 21 choices, 18 non-forced,
 with no backtracking. The
 [explained decision trace](algorithm/wfc_decisions_explained.txt) gives the
 full-precision costs, normalization and reconstructed random draw for each
-choice. No animated GIF is included in the final package; the building PNG
-shows the accepted result, while these text traces document
-how the slide was generated. The traces were generated from a replay whose
+choice. The [slide animation](algorithm/slide_generation.gif) shows each
+recorded choice in top and elevation views, with the committed prefix in teal,
+the sampled step in orange, the complete route as a grey reference, and the
+eligible tile probabilities. The
+[last-choice frame](algorithm/slide_generation.png) is available separately.
+These are grid-cell views, not the smoothed Blender centerline or a visualization
+of all WFC domains; intermediate forced cells appear in the next recorded
+prefix. The traces were generated from a replay whose
 building and original text matched the accepted artifacts; no solver
 instrumentation or changes to the solver were needed.
-
-The earlier DFS baseline coordinates are retained at
-[`baseline/building_seed10_res3.json`](baseline/building_seed10_res3.json).
-They describe a superseded five-floor, 5-by-5 building and are not the
-authoritative hybrid result.
 
 ## Settings and findings
 
@@ -56,13 +56,15 @@ small exploratory comparisons, not general reliability or timing claims.
 Use fresh paths outside this package. The hybrid runner explicitly selects the
 length-bounded hybrid, generates a recorded execution, and embeds the
 Blender-compatible accepted building as the `building` object. The first
-visualization command uses the frozen JSON directly; the second renders the
-actual decisions in a newly recorded execution:
+visualization command uses the frozen JSON directly. The animation command
+reconstructs the saved trace without rerunning the solver; the remaining
+commands produce and verify a newly recorded execution:
 
 ```powershell
 $env:PYTHONHASHSEED = "0"
 $env:MPLBACKEND = "Agg"
 python -m examples.hybrid_building_visualize results\final\building\building_seed10_hybrid.json --output results\hybrid_figure_reproduced.png
+python -m examples.hybrid_slide_animation --output results\slide_animation_reproduced
 python -m examples.hybrid_experiment --strategy hybrid --weighting compact --relative-budget --minimum-clearance 0.25 --routing-seed 10 --max-seconds 60 --max-backtracks 8 --route-attempts 3 --geometry-preference 1.5 --geometry-backtracking --trace-states --trace-route-id '0:(0, 4, 3)->(0, 0, 0):slide' --output results\hybrid_reproduced.json --building-output results\hybrid_building_reproduced.json
 python -m examples.hybrid_length_trace results\hybrid_reproduced.json --reference-building results\final\building\building_seed10_hybrid.json --route-id '0:(0, 4, 3)->(0, 0, 0):slide' --output results\hybrid_reproduced_slide
 python -m examples.explain_hybrid_decisions results\hybrid_reproduced.json --events results\hybrid_reproduced.events.jsonl --replay-visualization results\hybrid_reproduced_slide --output results\hybrid_decisions_explained_reproduced.txt

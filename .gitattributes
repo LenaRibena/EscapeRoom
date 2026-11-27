@@ -4,4 +4,3 @@ src/human.py text eol=lf
 results/final/building/building_seed10_hybrid.json text eol=lf
 results/final/algorithm/wfc_decisions.txt text eol=lf
 results/final/algorithm/wfc_decisions_explained.txt text eol=lf
-results/final/baseline/building_seed10_res3.json text eol=lf
