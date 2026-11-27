@@ -1,0 +1,752 @@
+ACCEPTED SLIDE 0: EXPLAINED HYBRID WFC DECISIONS
+Route (0,4,3) -> (0,0,0); cells use (vertical layer, x, y).
+Directions N/E/S/W are +y/+x/-y/-x; U/D are +layer/-layer.
+The 21 numbered choices and captions correspond to the existing GIF frames.
+The replay reproduced the accepted building and the GIF and original TXT byte-for-byte.
+
+HARD CONSTRAINTS, PROPAGATION AND SOFT WEIGHTS
+Local compatibility requires adjacent faces to have matching port kinds, including
+empty faces. Initially invalid tiles are removed; each trial fixes one tile, then
+propagates neighbor-domain restrictions until stable. The domain listed per choice
+is the remaining domain before that choice's hard candidate filters, not all 22 tiles.
+Global BFS builds an over-approximate directed possible-port graph, reaches forward
+from the start and backward from the end, and removes slide tiles in cells outside
+their intersection. In this run tile-aware BFS is off. This envelope permits
+different possible tiles to support different edges; it is not proof of a valid route.
+BFS already uses horizontal/downward slide edges; the separate prefix/candidate checks
+also enforce no upward step for the particular chosen tile, preventing a possible
+BFS path from being mistaken for the committed tile's directed continuation.
+The committed prefix cannot revisit a cell: a single tile assignment cannot encode
+the repeated visits as a simple route, and a loop is not a valid slide. The relaxed
+initial shortest-walk bound can revisit cells; it is only a lower bound.
+A candidate can pass topology and still fail continuous interpolation, curvature,
+collision or 0.25 graph-unit centerline clearance after the route is completed.
+These checks are hard, while compactness and turn penalties only adjust sampling weights.
+After selecting a trial, local counts include propagation following global changes;
+global counts are possibilities removed by BFS pruning, excluding direct collapse.
+Thousands can disappear when a choice cuts off a large possible-path envelope; zero
+means BFS found nothing further to remove at that step, not that BFS was skipped.
+
+BUDGET AND WEIGHT EQUATIONS
+Initial directed, port-compatible relaxed walk lower bound = 22 cells.
+Maximum = 22 + min(4, ceil(0.25 * (22 - 1))) = 26 cells.
+Required horizontal travel H = 6 refined-grid steps.
+For prefix P including the selected frontier, and proposed successor s:
+h_done = horizontal steps already in P plus 1 if cell->s is horizontal;
+h_distance = Manhattan XY distance from s to end;
+h_needed = max(h_distance, H - h_done);
+B = len(P) + 1 + (s.layer - end.layer) + h_needed.
+B is a lower bound on the entire route in cells; B > 26 is rejected.
+compact = 0.12 * max(0, B - len(P)).
+turn = 0 for vertical, first horizontal or straight continuation; otherwise
+turn = (3 for reversal, 1 for a turn) + 1 / preceding horizontal run length.
+Vertical steps do not break that run. geometry = 1.5 * turn.
+weight = max(1e-12, exp(-compact - geometry)); probability = weight / sum(weights).
+The factors exp(-compact) and exp(-geometry) are shown for interpretation; the
+implementation uses a single exp of the summed costs (floating-point rounding may differ).
+Displayed full-precision values are Python binary floats, not values recovered from
+the rounded percentages in the original text. RNG sampling can choose any positive
+probability; a single eligible candidate is forced, not a substantive random choice.
+Sampling draws below are reconstructed after the run with a separate Random(10),
+not read from rounded percentages or taken from the solver's random generator.
+The reconstructed draw must reproduce every recorded selected candidate.
+
+Choice 1 | cell (8, 0, 12) | slide_descending_S_U | 4 eligible | sampled 28.0%
+  Position: cell 2 of 26, with 24 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12)]
+  Entering from (9, 0, 12) through U; end = (0, 0, 0).
+  Domain before candidate filters: slide_descending_N_U (N+U), slide_descending_E_U (E+U), slide_descending_S_U (S+U), slide_straight_U_D (U+D)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_descending_N_U [U+N] -> (8, 0, 13):
+      h_done=1, h_distance=13, h_needed=max(13, 6-1)=13;
+      B=2+1+(8-0)+13=24; compact=0.12*(24-2)=2.6399999999999997.
+      no preceding horizontal direction; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.07136126955638608; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-2.6399999999999997-0.0))=0.07136126955638608.
+      probability=0.07136126955638608/0.3241584456915972=0.22014317536640354 (22.01%).
+    slide_descending_E_U [U+E] -> (8, 1, 12):
+      h_done=1, h_distance=13, h_needed=max(13, 6-1)=13;
+      B=2+1+(8-0)+13=24; compact=0.12*(24-2)=2.6399999999999997.
+      no preceding horizontal direction; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.07136126955638608; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-2.6399999999999997-0.0))=0.07136126955638608.
+      probability=0.07136126955638608/0.3241584456915972=0.22014317536640354 (22.01%).
+    slide_descending_S_U [U+S] -> (8, 0, 11):
+      h_done=1, h_distance=11, h_needed=max(11, 6-1)=11;
+      B=2+1+(8-0)+11=22; compact=0.12*(22-2)=2.4.
+      no preceding horizontal direction; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.09071795328941251; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-2.4-0.0))=0.09071795328941251.
+      probability=0.09071795328941251/0.3241584456915972=0.27985682463359646 (27.99%).
+    slide_straight_U_D [U+D] -> (7, 0, 12):
+      h_done=0, h_distance=12, h_needed=max(12, 6-0)=12;
+      B=2+1+(7-0)+12=22; compact=0.12*(22-2)=2.4.
+      no preceding horizontal direction; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.09071795328941251; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-2.4-0.0))=0.09071795328941251.
+      probability=0.09071795328941251/0.3241584456915972=0.27985682463359646 (27.99%).
+  Normalization: sum weights = 0.07136126955638608 + 0.07136126955638608 + 0.09071795328941251 + 0.09071795328941251 = 0.3241584456915972;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.5714025946899135, u*sum=0.18522497695882803; cumulative weights = [0.07136126955638608, 0.14272253911277216, 0.23344049240218467, 0.3241584456915972].
+  Sampled slide_descending_S_U: enters via U, exits via S to (8, 0, 11).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 14; global BFS removed 0 tile possibilities.
+
+Choice 2 | cell (8, 0, 11) | slide_straight_N_S | 3 eligible | sampled 49.0%
+  Position: cell 3 of 26, with 23 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11)]
+  Entering from (8, 0, 12) through N; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_E (N+E), slide_straight_N_S (N+S), slide_descending_N_D (N+D)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_turn_N_E [N+E] -> (8, 1, 11):
+      h_done=2, h_distance=12, h_needed=max(12, 6-2)=12;
+      B=3+1+(8-0)+12=24; compact=0.12*(24-3)=2.52.
+      turn from (0, -1) to (1, 0); preceding run 1, cost 1 + 1/1; turn cost=2.0; geometry=1.5*2.0=3.0.
+      exp(-compact)=0.08045960674953244; exp(-geometry)=0.049787068367863944;
+      weight=max(1e-12, exp(-2.52-3.0))=0.00400584794209042.
+      probability=0.00400584794209042/0.20857426137316537=0.01920585941773256 (1.92%).
+    slide_straight_N_S [N+S] -> (8, 0, 10):
+      h_done=2, h_distance=10, h_needed=max(10, 6-2)=10;
+      B=3+1+(8-0)+10=22; compact=0.12*(22-3)=2.28.
+      continues horizontal direction (0, -1), run 1; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.10228420671553748; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-2.28-0.0))=0.10228420671553748.
+      probability=0.10228420671553748/0.20857426137316537=0.4903970702911337 (49.04%).
+    slide_descending_N_D [N+D] -> (7, 0, 11):
+      h_done=1, h_distance=11, h_needed=max(11, 6-1)=11;
+      B=3+1+(7-0)+11=22; compact=0.12*(22-3)=2.28.
+      vertical; last horizontal direction (0, -1), run 1; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.10228420671553748; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-2.28-0.0))=0.10228420671553748.
+      probability=0.10228420671553748/0.20857426137316537=0.4903970702911337 (49.04%).
+  Normalization: sum weights = 0.00400584794209042 + 0.10228420671553748 + 0.10228420671553748 = 0.20857426137316537;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.4288890546751146, u*sum=0.08945521778989717; cumulative weights = [0.00400584794209042, 0.1062900546576279, 0.20857426137316537].
+  Sampled slide_straight_N_S: enters via N, exits via S to (8, 0, 10).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 12; global BFS removed 0 tile possibilities.
+
+Choice 3 | cell (8, 0, 10) | slide_descending_N_D | 3 eligible | sampled 48.0%
+  Position: cell 4 of 26, with 22 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10)]
+  Entering from (8, 0, 11) through N; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_E (N+E), slide_straight_N_S (N+S), slide_descending_N_D (N+D)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_turn_N_E [N+E] -> (8, 1, 10):
+      h_done=3, h_distance=11, h_needed=max(11, 6-3)=11;
+      B=4+1+(8-0)+11=24; compact=0.12*(24-4)=2.4.
+      turn from (0, -1) to (1, 0); preceding run 2, cost 1 + 1/2; turn cost=1.5; geometry=1.5*1.5=2.25.
+      exp(-compact)=0.09071795328941251; exp(-geometry)=0.10539922456186433;
+      weight=max(1e-12, exp(-2.4-2.25))=0.009561601930543505.
+      probability=0.009561601930543505/0.24021184400666853=0.039804872944891365 (3.98%).
+    slide_straight_N_S [N+S] -> (8, 0, 9):
+      h_done=3, h_distance=9, h_needed=max(9, 6-3)=9;
+      B=4+1+(8-0)+9=22; compact=0.12*(22-4)=2.16.
+      continues horizontal direction (0, -1), run 2; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.11532512103806251; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-2.16-0.0))=0.11532512103806251.
+      probability=0.11532512103806251/0.24021184400666853=0.48009756352755434 (48.01%).
+    slide_descending_N_D [N+D] -> (7, 0, 10):
+      h_done=2, h_distance=10, h_needed=max(10, 6-2)=10;
+      B=4+1+(7-0)+10=22; compact=0.12*(22-4)=2.16.
+      vertical; last horizontal direction (0, -1), run 2; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.11532512103806251; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-2.16-0.0))=0.11532512103806251.
+      probability=0.11532512103806251/0.24021184400666853=0.48009756352755434 (48.01%).
+  Normalization: sum weights = 0.009561601930543505 + 0.11532512103806251 + 0.11532512103806251 = 0.24021184400666853;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.5780913011344704, u*sum=0.13886437744972543; cumulative weights = [0.009561601930543505, 0.12488672296860602, 0.24021184400666853].
+  Sampled slide_descending_N_D: enters via N, exits via D to (7, 0, 10).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 3684; global BFS removed 7284 tile possibilities.
+
+Choice 4 | cell (7, 0, 10) | slide_descending_S_U | 4 eligible | sampled 47.9%
+  Position: cell 5 of 26, with 21 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10)]
+  Entering from (8, 0, 10) through U; end = (0, 0, 0).
+  Domain before candidate filters: slide_descending_N_U (N+U), slide_descending_E_U (E+U), slide_descending_S_U (S+U), slide_straight_U_D (U+D)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_descending_N_U [U+N] -> (7, 0, 11):
+      h_done=3, h_distance=11, h_needed=max(11, 6-3)=11;
+      B=5+1+(7-0)+11=24; compact=0.12*(24-5)=2.28.
+      reversal from (0, -1) to (0, 1); preceding run 2, cost 3 + 1/2; turn cost=3.5; geometry=1.5*3.5=5.25.
+      exp(-compact)=0.10228420671553748; exp(-geometry)=0.005247518399181385;
+      weight=max(1e-12, exp(-2.28-5.25))=0.0005367382566854553.
+      probability=0.0005367382566854553/0.2713748360862804=0.00197784829435993 (0.20%).
+    slide_descending_E_U [U+E] -> (7, 1, 10):
+      h_done=3, h_distance=11, h_needed=max(11, 6-3)=11;
+      B=5+1+(7-0)+11=24; compact=0.12*(24-5)=2.28.
+      turn from (0, -1) to (1, 0); preceding run 2, cost 1 + 1/2; turn cost=1.5; geometry=1.5*1.5=2.25.
+      exp(-compact)=0.10228420671553748; exp(-geometry)=0.10539922456186433;
+      weight=max(1e-12, exp(-2.28-2.25))=0.010780676072743092.
+      probability=0.010780676072743092/0.2713748360862804=0.03972614494483013 (3.97%).
+    slide_descending_S_U [U+S] -> (7, 0, 9):
+      h_done=3, h_distance=9, h_needed=max(9, 6-3)=9;
+      B=5+1+(7-0)+9=22; compact=0.12*(22-5)=2.04.
+      continues horizontal direction (0, -1), run 2; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.1300287108784259; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-2.04-0.0))=0.1300287108784259.
+      probability=0.1300287108784259/0.2713748360862804=0.4791480033804049 (47.91%).
+    slide_straight_U_D [U+D] -> (6, 0, 10):
+      h_done=2, h_distance=10, h_needed=max(10, 6-2)=10;
+      B=5+1+(6-0)+10=22; compact=0.12*(22-5)=2.04.
+      vertical; last horizontal direction (0, -1), run 2; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.1300287108784259; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-2.04-0.0))=0.1300287108784259.
+      probability=0.1300287108784259/0.2713748360862804=0.4791480033804049 (47.91%).
+  Normalization: sum weights = 0.0005367382566854553 + 0.010780676072743092 + 0.1300287108784259 + 0.1300287108784259 = 0.2713748360862804;
+    sum probabilities = 0.9999999999999999 (100% within floating-point rounding).
+  Independent RNG replay: u=0.20609823213950174, u*sum=0.05592987396452945; cumulative weights = [0.0005367382566854553, 0.011317414329428548, 0.14134612520785445, 0.2713748360862803].
+  Sampled slide_descending_S_U: enters via U, exits via S to (7, 0, 9).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 14; global BFS removed 0 tile possibilities.
+
+Choice 5 | cell (7, 0, 9) | slide_straight_N_S | 2 eligible | sampled 90.4%
+  Position: cell 6 of 26, with 20 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9)]
+  Entering from (7, 0, 10) through N; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_E (N+E), slide_straight_N_S (N+S)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_turn_N_E [N+E] -> (7, 1, 9):
+      h_done=4, h_distance=10, h_needed=max(10, 6-4)=10;
+      B=6+1+(7-0)+10=24; compact=0.12*(24-6)=2.16.
+      turn from (0, -1) to (1, 0); preceding run 3, cost 1 + 1/3; turn cost=1.3333333333333333; geometry=1.5*1.3333333333333333=2.0.
+      exp(-compact)=0.11532512103806251; exp(-geometry)=0.1353352832366127;
+      weight=max(1e-12, exp(-2.16-2.0))=0.01560755791998283.
+      probability=0.01560755791998283/0.162214520050333=0.09621554171069283 (9.62%).
+    slide_straight_N_S [N+S] -> (7, 0, 8):
+      h_done=4, h_distance=8, h_needed=max(8, 6-4)=8;
+      B=6+1+(7-0)+8=22; compact=0.12*(22-6)=1.92.
+      continues horizontal direction (0, -1), run 3; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.14660696213035015; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-1.92-0.0))=0.14660696213035015.
+      probability=0.14660696213035015/0.162214520050333=0.9037844582893072 (90.38%).
+  Normalization: sum weights = 0.01560755791998283 + 0.14660696213035015 = 0.162214520050333;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.81332125135732, u*sum=0.1319325164356639; cumulative weights = [0.01560755791998283, 0.162214520050333].
+  Sampled slide_straight_N_S: enters via N, exits via S to (7, 0, 8).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 8; global BFS removed 0 tile possibilities.
+
+Choice 6 | cell (7, 0, 8) | slide_descending_N_D | 3 eligible | sampled 47.2%
+  Position: cell 7 of 26, with 19 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8)]
+  Entering from (7, 0, 9) through N; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_E (N+E), slide_straight_N_S (N+S), slide_descending_N_D (N+D)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_turn_N_E [N+E] -> (7, 1, 8):
+      h_done=5, h_distance=9, h_needed=max(9, 6-5)=9;
+      B=7+1+(7-0)+9=24; compact=0.12*(24-7)=2.04.
+      turn from (0, -1) to (1, 0); preceding run 4, cost 1 + 1/4; turn cost=1.25; geometry=1.5*1.25=1.875.
+      exp(-compact)=0.1300287108784259; exp(-geometry)=0.15335496684492847;
+      weight=max(1e-12, exp(-2.04-1.875))=0.019940548645649796.
+      probability=0.019940548645649796/0.35053832508882293=0.05688550215043408 (5.69%).
+    slide_straight_N_S [N+S] -> (7, 0, 7):
+      h_done=5, h_distance=7, h_needed=max(7, 6-5)=7;
+      B=7+1+(7-0)+7=22; compact=0.12*(22-7)=1.7999999999999998.
+      continues horizontal direction (0, -1), run 4; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.16529888822158656; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-1.7999999999999998-0.0))=0.16529888822158656.
+      probability=0.16529888822158656/0.35053832508882293=0.47155724892478296 (47.16%).
+    slide_descending_N_D [N+D] -> (6, 0, 8):
+      h_done=4, h_distance=8, h_needed=max(8, 6-4)=8;
+      B=7+1+(6-0)+8=22; compact=0.12*(22-7)=1.7999999999999998.
+      vertical; last horizontal direction (0, -1), run 4; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.16529888822158656; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-1.7999999999999998-0.0))=0.16529888822158656.
+      probability=0.16529888822158656/0.35053832508882293=0.47155724892478296 (47.16%).
+  Normalization: sum weights = 0.019940548645649796 + 0.16529888822158656 + 0.16529888822158656 = 0.35053832508882293;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.8235888725334455, u*sum=0.28869946393966606; cumulative weights = [0.019940548645649796, 0.18523943686723635, 0.3505383250888229].
+  Sampled slide_descending_N_D: enters via N, exits via D to (6, 0, 8).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 3345; global BFS removed 7641 tile possibilities.
+
+Choice 7 | cell (5, 0, 8) | slide_straight_U_D | 4 eligible | sampled 47.0%
+  Position: cell 9 of 26, with 17 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8)]
+  Entering from (6, 0, 8) through U; end = (0, 0, 0).
+  Domain before candidate filters: slide_descending_N_U (N+U), slide_descending_E_U (E+U), slide_descending_S_U (S+U), slide_straight_U_D (U+D)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_descending_N_U [U+N] -> (5, 0, 9):
+      h_done=5, h_distance=9, h_needed=max(9, 6-5)=9;
+      B=9+1+(5-0)+9=24; compact=0.12*(24-9)=1.7999999999999998.
+      reversal from (0, -1) to (0, 1); preceding run 4, cost 3 + 1/4; turn cost=3.25; geometry=1.5*3.25=4.875.
+      exp(-compact)=0.16529888822158656; exp(-geometry)=0.007635094218859962;
+      weight=max(1e-12, exp(-1.7999999999999998-4.875))=0.0012620725858446145.
+      probability=0.0012620725858446145/0.446883620510099=0.0028241638939552347 (0.28%).
+    slide_descending_E_U [U+E] -> (5, 1, 8):
+      h_done=5, h_distance=9, h_needed=max(9, 6-5)=9;
+      B=9+1+(5-0)+9=24; compact=0.12*(24-9)=1.7999999999999998.
+      turn from (0, -1) to (1, 0); preceding run 4, cost 1 + 1/4; turn cost=1.25; geometry=1.5*1.25=1.875.
+      exp(-compact)=0.16529888822158656; exp(-geometry)=0.15335496684492847;
+      weight=max(1e-12, exp(-1.7999999999999998-1.875))=0.025349405522724945.
+      probability=0.025349405522724945/0.446883620510099=0.05672484816917133 (5.67%).
+    slide_descending_S_U [U+S] -> (5, 0, 7):
+      h_done=5, h_distance=7, h_needed=max(7, 6-5)=7;
+      B=9+1+(5-0)+7=22; compact=0.12*(22-9)=1.56.
+      continues horizontal direction (0, -1), run 4; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.21013607120076472; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-1.56-0.0))=0.21013607120076472.
+      probability=0.21013607120076472/0.446883620510099=0.4702254939684367 (47.02%).
+    slide_straight_U_D [U+D] -> (4, 0, 8):
+      h_done=4, h_distance=8, h_needed=max(8, 6-4)=8;
+      B=9+1+(4-0)+8=22; compact=0.12*(22-9)=1.56.
+      vertical; last horizontal direction (0, -1), run 4; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.21013607120076472; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-1.56-0.0))=0.21013607120076472.
+      probability=0.21013607120076472/0.446883620510099=0.4702254939684367 (47.02%).
+  Normalization: sum weights = 0.0012620725858446145 + 0.025349405522724945 + 0.21013607120076472 + 0.21013607120076472 = 0.446883620510099;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.6534725339011758, u*sum=0.29202617185366586; cumulative weights = [0.0012620725858446145, 0.02661147810856956, 0.23674754930933428, 0.446883620510099].
+  Sampled slide_straight_U_D: enters via U, exits via D to (4, 0, 8).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 3691; global BFS removed 7312 tile possibilities.
+
+Choice 8 | cell (4, 0, 8) | slide_descending_S_U | 4 eligible | sampled 47.0%
+  Position: cell 10 of 26, with 16 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8), (4, 0, 8)]
+  Entering from (5, 0, 8) through U; end = (0, 0, 0).
+  Domain before candidate filters: slide_descending_N_U (N+U), slide_descending_E_U (E+U), slide_descending_S_U (S+U), slide_straight_U_D (U+D)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_descending_N_U [U+N] -> (4, 0, 9):
+      h_done=5, h_distance=9, h_needed=max(9, 6-5)=9;
+      B=10+1+(4-0)+9=24; compact=0.12*(24-10)=1.68.
+      reversal from (0, -1) to (0, 1); preceding run 4, cost 3 + 1/4; turn cost=3.25; geometry=1.5*3.25=4.875.
+      exp(-compact)=0.18637397603940997; exp(-geometry)=0.007635094218859962;
+      weight=max(1e-12, exp(-1.68-4.875))=0.0014229828670044445.
+      probability=0.0014229828670044445/0.5038598751475292=0.002824163893955235 (0.28%).
+    slide_descending_E_U [U+E] -> (4, 1, 8):
+      h_done=5, h_distance=9, h_needed=max(9, 6-5)=9;
+      B=10+1+(4-0)+9=24; compact=0.12*(24-10)=1.68.
+      turn from (0, -1) to (1, 0); preceding run 4, cost 1 + 1/4; turn cost=1.25; geometry=1.5*1.25=1.875.
+      exp(-compact)=0.18637397603940997; exp(-geometry)=0.15335496684492847;
+      weight=max(1e-12, exp(-1.68-1.875))=0.028581374916281214.
+      probability=0.028581374916281214/0.5038598751475292=0.05672484816917133 (5.67%).
+    slide_descending_S_U [U+S] -> (4, 0, 7):
+      h_done=5, h_distance=7, h_needed=max(7, 6-5)=7;
+      B=10+1+(4-0)+7=22; compact=0.12*(22-10)=1.44.
+      continues horizontal direction (0, -1), run 4; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.23692775868212176; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-1.44-0.0))=0.23692775868212176.
+      probability=0.23692775868212176/0.5038598751475292=0.4702254939684367 (47.02%).
+    slide_straight_U_D [U+D] -> (3, 0, 8):
+      h_done=4, h_distance=8, h_needed=max(8, 6-4)=8;
+      B=10+1+(3-0)+8=22; compact=0.12*(22-10)=1.44.
+      vertical; last horizontal direction (0, -1), run 4; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.23692775868212176; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-1.44-0.0))=0.23692775868212176.
+      probability=0.23692775868212176/0.5038598751475292=0.4702254939684367 (47.02%).
+  Normalization: sum weights = 0.0014229828670044445 + 0.028581374916281214 + 0.23692775868212176 + 0.23692775868212176 = 0.5038598751475292;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.16022955651881965, u*sum=0.08073324434251644; cumulative weights = [0.0014229828670044445, 0.030004357783285657, 0.26693211646540743, 0.5038598751475292].
+  Sampled slide_descending_S_U: enters via U, exits via S to (4, 0, 7).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 15; global BFS removed 0 tile possibilities.
+
+Choice 9 | cell (4, 0, 7) | slide_straight_N_S | 3 eligible | sampled 46.9%
+  Position: cell 11 of 26, with 15 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8), (4, 0, 8), (4, 0, 7)]
+  Entering from (4, 0, 8) through N; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_E (N+E), slide_straight_N_S (N+S), slide_descending_N_D (N+D)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_turn_N_E [N+E] -> (4, 1, 7):
+      h_done=6, h_distance=8, h_needed=max(8, 6-6)=8;
+      B=11+1+(4-0)+8=24; compact=0.12*(24-11)=1.56.
+      turn from (0, -1) to (1, 0); preceding run 5, cost 1 + 1/5; turn cost=1.2; geometry=1.5*1.2=1.7999999999999998.
+      exp(-compact)=0.21013607120076472; exp(-geometry)=0.16529888822158656;
+      weight=max(1e-12, exp(-1.56-1.7999999999999998))=0.03473525894473856.
+      probability=0.03473525894473856/0.5690058628764394=0.06104552028540589 (6.10%).
+    slide_straight_N_S [N+S] -> (4, 0, 6):
+      h_done=6, h_distance=6, h_needed=max(6, 6-6)=6;
+      B=11+1+(4-0)+6=22; compact=0.12*(22-11)=1.3199999999999998.
+      continues horizontal direction (0, -1), run 5; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.2671353019658504; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-1.3199999999999998-0.0))=0.2671353019658504.
+      probability=0.2671353019658504/0.5690058628764394=0.469477239857297 (46.95%).
+    slide_descending_N_D [N+D] -> (3, 0, 7):
+      h_done=5, h_distance=7, h_needed=max(7, 6-5)=7;
+      B=11+1+(3-0)+7=22; compact=0.12*(22-11)=1.3199999999999998.
+      vertical; last horizontal direction (0, -1), run 5; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.2671353019658504; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-1.3199999999999998-0.0))=0.2671353019658504.
+      probability=0.2671353019658504/0.5690058628764394=0.469477239857297 (46.95%).
+  Normalization: sum weights = 0.03473525894473856 + 0.2671353019658504 + 0.2671353019658504 = 0.5690058628764394;
+    sum probabilities = 0.9999999999999999 (100% within floating-point rounding).
+  Independent RNG replay: u=0.5206693596399246, u*sum=0.2962639182552384; cumulative weights = [0.03473525894473856, 0.30187056091058895, 0.5690058628764394].
+  Sampled slide_straight_N_S: enters via N, exits via S to (4, 0, 6).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 11; global BFS removed 0 tile possibilities.
+
+Choice 10 | cell (4, 0, 6) | slide_straight_N_S | 2 eligible | sampled 88.0%
+  Position: cell 12 of 26, with 14 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8), (4, 0, 8), (4, 0, 7), (4, 0, 6)]
+  Entering from (4, 0, 7) through N; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_E (N+E), slide_straight_N_S (N+S)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_turn_N_E [N+E] -> (4, 1, 6):
+      h_done=7, h_distance=7, h_needed=max(7, 6-7)=7;
+      B=12+1+(4-0)+7=24; compact=0.12*(24-12)=1.44.
+      turn from (0, -1) to (1, 0); preceding run 6, cost 1 + 1/6; turn cost=1.1666666666666667; geometry=1.5*1.1666666666666667=1.75.
+      exp(-compact)=0.23692775868212176; exp(-geometry)=0.17377394345044514;
+      weight=max(1e-12, exp(-1.44-1.75))=0.04117187093906774.
+      probability=0.04117187093906774/0.3423660828512699=0.1202568624677508 (12.03%).
+    slide_straight_N_S [N+S] -> (4, 0, 5):
+      h_done=7, h_distance=5, h_needed=max(5, 6-7)=5;
+      B=12+1+(4-0)+5=22; compact=0.12*(22-12)=1.2.
+      continues horizontal direction (0, -1), run 6; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.30119421191220214; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-1.2-0.0))=0.30119421191220214.
+      probability=0.30119421191220214/0.3423660828512699=0.8797431375322491 (87.97%).
+  Normalization: sum weights = 0.04117187093906774 + 0.30119421191220214 = 0.3423660828512699;
+    sum probabilities = 0.9999999999999999 (100% within floating-point rounding).
+  Independent RNG replay: u=0.32777281162209315, u*sum=0.11221829358020323; cumulative weights = [0.04117187093906774, 0.3423660828512699].
+  Sampled slide_straight_N_S: enters via N, exits via S to (4, 0, 5).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 8; global BFS removed 0 tile possibilities.
+
+Choice 11 | cell (4, 0, 5) | slide_straight_N_S | 3 eligible | sampled 46.7%
+  Position: cell 13 of 26, with 13 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8), (4, 0, 8), (4, 0, 7), (4, 0, 6), (4, 0, 5)]
+  Entering from (4, 0, 6) through N; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_E (N+E), slide_straight_N_S (N+S), slide_descending_N_D (N+D)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_turn_N_E [N+E] -> (4, 1, 5):
+      h_done=8, h_distance=6, h_needed=max(6, 6-8)=6;
+      B=13+1+(4-0)+6=24; compact=0.12*(24-13)=1.3199999999999998.
+      turn from (0, -1) to (1, 0); preceding run 7, cost 1 + 1/7; turn cost=1.1428571428571428; geometry=1.5*1.1428571428571428=1.7142857142857142.
+      exp(-compact)=0.2671353019658504; exp(-geometry)=0.1800923121479524;
+      weight=max(1e-12, exp(-1.3199999999999998-1.7142857142857142))=0.048109014187371464.
+      probability=0.048109014187371464/0.7273000654772497=0.06614740802450311 (6.61%).
+    slide_straight_N_S [N+S] -> (4, 0, 4):
+      h_done=8, h_distance=4, h_needed=max(4, 6-8)=4;
+      B=13+1+(4-0)+4=22; compact=0.12*(22-13)=1.08.
+      continues horizontal direction (0, -1), run 7; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.3395955256449391; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-1.08-0.0))=0.3395955256449391.
+      probability=0.3395955256449391/0.7273000654772497=0.46692629598774843 (46.69%).
+    slide_descending_N_D [N+D] -> (3, 0, 5):
+      h_done=7, h_distance=5, h_needed=max(5, 6-7)=5;
+      B=13+1+(3-0)+5=22; compact=0.12*(22-13)=1.08.
+      vertical; last horizontal direction (0, -1), run 7; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.3395955256449391; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-1.08-0.0))=0.3395955256449391.
+      probability=0.3395955256449391/0.7273000654772497=0.46692629598774843 (46.69%).
+  Normalization: sum weights = 0.048109014187371464 + 0.3395955256449391 + 0.3395955256449391 = 0.7273000654772497;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.24999667668640035, u*sum=0.1818225993231138; cumulative weights = [0.048109014187371464, 0.38770453983231057, 0.7273000654772497].
+  Sampled slide_straight_N_S: enters via N, exits via S to (4, 0, 4).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 13; global BFS removed 0 tile possibilities.
+
+Choice 12 | cell (4, 0, 4) | slide_descending_N_D | 3 eligible | sampled 46.6%
+  Position: cell 14 of 26, with 12 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8), (4, 0, 8), (4, 0, 7), (4, 0, 6), (4, 0, 5), (4, 0, 4)]
+  Entering from (4, 0, 5) through N; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_E (N+E), slide_straight_N_S (N+S), slide_descending_N_D (N+D)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_turn_N_E [N+E] -> (4, 1, 4):
+      h_done=9, h_distance=5, h_needed=max(5, 6-9)=5;
+      B=14+1+(4-0)+5=24; compact=0.12*(24-14)=1.2.
+      turn from (0, -1) to (1, 0); preceding run 8, cost 1 + 1/8; turn cost=1.125; geometry=1.5*1.125=1.6875.
+      exp(-compact)=0.30119421191220214; exp(-geometry)=0.18498139990730428;
+      weight=max(1e-12, exp(-1.2-1.6875))=0.055715326963496396.
+      probability=0.055715326963496396/0.8215010989137205=0.06782136632217456 (6.78%).
+    slide_straight_N_S [N+S] -> (4, 0, 3):
+      h_done=9, h_distance=3, h_needed=max(3, 6-9)=3;
+      B=14+1+(4-0)+3=22; compact=0.12*(22-14)=0.96.
+      continues horizontal direction (0, -1), run 8; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.38289288597511206; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-0.96-0.0))=0.38289288597511206.
+      probability=0.38289288597511206/0.8215010989137205=0.46608931683891275 (46.61%).
+    slide_descending_N_D [N+D] -> (3, 0, 4):
+      h_done=8, h_distance=4, h_needed=max(4, 6-8)=4;
+      B=14+1+(3-0)+4=22; compact=0.12*(22-14)=0.96.
+      vertical; last horizontal direction (0, -1), run 8; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.38289288597511206; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-0.96-0.0))=0.38289288597511206.
+      probability=0.38289288597511206/0.8215010989137205=0.46608931683891275 (46.61%).
+  Normalization: sum weights = 0.055715326963496396 + 0.38289288597511206 + 0.38289288597511206 = 0.8215010989137205;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.9528169091459117, u*sum=0.782740137926941; cumulative weights = [0.055715326963496396, 0.43860821293860847, 0.8215010989137206].
+  Sampled slide_descending_N_D: enters via N, exits via D to (3, 0, 4).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 3335; global BFS removed 7601 tile possibilities.
+
+Choice 13 | cell (2, 0, 4) | slide_straight_U_D | 4 eligible | sampled 46.5%
+  Position: cell 16 of 26, with 10 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8), (4, 0, 8), (4, 0, 7), (4, 0, 6), (4, 0, 5), (4, 0, 4), (3, 0, 4), (2, 0, 4)]
+  Entering from (3, 0, 4) through U; end = (0, 0, 0).
+  Domain before candidate filters: slide_descending_N_U (N+U), slide_descending_E_U (E+U), slide_descending_S_U (S+U), slide_straight_U_D (U+D)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_descending_N_U [U+N] -> (2, 0, 5):
+      h_done=9, h_distance=5, h_needed=max(5, 6-9)=5;
+      B=16+1+(2-0)+5=24; compact=0.12*(24-16)=0.96.
+      reversal from (0, -1) to (0, 1); preceding run 8, cost 3 + 1/8; turn cost=3.125; geometry=1.5*3.125=4.6875.
+      exp(-compact)=0.38289288597511206; exp(-geometry)=0.00920968160396814;
+      weight=max(1e-12, exp(-0.96-4.6875))=0.00352632156825526.
+      probability=0.00352632156825526/1.0478588955504227=0.00336526376139885 (0.34%).
+    slide_descending_E_U [U+E] -> (2, 1, 4):
+      h_done=9, h_distance=5, h_needed=max(5, 6-9)=5;
+      B=16+1+(2-0)+5=24; compact=0.12*(24-16)=0.96.
+      turn from (0, -1) to (1, 0); preceding run 8, cost 1 + 1/8; turn cost=1.125; geometry=1.5*1.125=1.6875.
+      exp(-compact)=0.38289288597511206; exp(-geometry)=0.18498139990730428;
+      weight=max(1e-12, exp(-0.96-1.6875))=0.07082806206222406.
+      probability=0.07082806206222406/1.0478588955504227=0.06759312953584201 (6.76%).
+    slide_descending_S_U [U+S] -> (2, 0, 3):
+      h_done=9, h_distance=3, h_needed=max(3, 6-9)=3;
+      B=16+1+(2-0)+3=22; compact=0.12*(22-16)=0.72.
+      continues horizontal direction (0, -1), run 8; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.4867522559599717; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-0.72-0.0))=0.4867522559599717.
+      probability=0.4867522559599717/1.0478588955504227=0.4645208033513796 (46.45%).
+    slide_straight_U_D [U+D] -> (1, 0, 4):
+      h_done=8, h_distance=4, h_needed=max(4, 6-8)=4;
+      B=16+1+(1-0)+4=22; compact=0.12*(22-16)=0.72.
+      vertical; last horizontal direction (0, -1), run 8; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.4867522559599717; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-0.72-0.0))=0.4867522559599717.
+      probability=0.4867522559599717/1.0478588955504227=0.4645208033513796 (46.45%).
+  Normalization: sum weights = 0.00352632156825526 + 0.07082806206222406 + 0.4867522559599717 + 0.4867522559599717 = 1.0478588955504227;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.9965569925394552, u*sum=1.0442511095554443; cumulative weights = [0.00352632156825526, 0.07435438363047932, 0.561106639590451, 1.0478588955504227].
+  Sampled slide_straight_U_D: enters via U, exits via D to (1, 0, 4).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 3003; global BFS removed 7302 tile possibilities.
+
+Choice 14 | cell (1, 0, 4) | slide_descending_E_U | 3 eligible | sampled 12.6%
+  Position: cell 17 of 26, with 9 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8), (4, 0, 8), (4, 0, 7), (4, 0, 6), (4, 0, 5), (4, 0, 4), (3, 0, 4), (2, 0, 4), (1, 0, 4)]
+  Entering from (2, 0, 4) through U; end = (0, 0, 0).
+  Domain before candidate filters: slide_descending_N_U (N+U), slide_descending_E_U (E+U), slide_descending_S_U (S+U)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_descending_N_U [U+N] -> (1, 0, 5):
+      h_done=9, h_distance=5, h_needed=max(5, 6-9)=5;
+      B=17+1+(1-0)+5=24; compact=0.12*(24-17)=0.84.
+      reversal from (0, -1) to (0, 1); preceding run 8, cost 3 + 1/8; turn cost=3.125; geometry=1.5*3.125=4.6875.
+      exp(-compact)=0.43171052342907973; exp(-geometry)=0.00920968160396814;
+      weight=max(1e-12, exp(-0.84-4.6875))=0.003975916465864252.
+      probability=0.003975916465864252/0.632645969538517=0.006284583570119763 (0.63%).
+    slide_descending_E_U [U+E] -> (1, 1, 4):
+      h_done=9, h_distance=5, h_needed=max(5, 6-9)=5;
+      B=17+1+(1-0)+5=24; compact=0.12*(24-17)=0.84.
+      turn from (0, -1) to (1, 0); preceding run 8, cost 1 + 1/8; turn cost=1.125; geometry=1.5*1.125=1.6875.
+      exp(-compact)=0.43171052342907973; exp(-geometry)=0.18498139990730428;
+      weight=max(1e-12, exp(-0.84-1.6875))=0.07985841697862626.
+      probability=0.07985841697862626/0.632645969538517=0.1262292353444991 (12.62%).
+    slide_descending_S_U [U+S] -> (1, 0, 3):
+      h_done=9, h_distance=3, h_needed=max(3, 6-9)=3;
+      B=17+1+(1-0)+3=22; compact=0.12*(22-17)=0.6.
+      continues horizontal direction (0, -1), run 8; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.5488116360940265; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-0.6-0.0))=0.5488116360940265.
+      probability=0.5488116360940265/0.632645969538517=0.8674861810853811 (86.75%).
+  Normalization: sum weights = 0.003975916465864252 + 0.07985841697862626 + 0.5488116360940265 = 0.632645969538517;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.04455638245043303, u*sum=0.02818841577448317; cumulative weights = [0.003975916465864252, 0.08383433344449051, 0.632645969538517].
+  Sampled slide_descending_E_U: enters via U, exits via E to (1, 1, 4).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 8; global BFS removed 0 tile possibilities.
+
+Choice 15 | cell (1, 1, 4) | slide_straight_E_W | 3 eligible | sampled 89.8%
+  Position: cell 18 of 26, with 8 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8), (4, 0, 8), (4, 0, 7), (4, 0, 6), (4, 0, 5), (4, 0, 4), (3, 0, 4), (2, 0, 4), (1, 0, 4), (1, 1, 4)]
+  Entering from (1, 0, 4) through W; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_W (N+W), slide_straight_E_W (E+W), slide_turn_S_W (S+W)
+  Rejected by these hard filters: none.
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_turn_N_W [W+N] -> (1, 1, 5):
+      h_done=10, h_distance=6, h_needed=max(6, 6-10)=6;
+      B=18+1+(1-0)+6=26; compact=0.12*(26-18)=0.96.
+      turn from (1, 0) to (0, 1); preceding run 1, cost 1 + 1/1; turn cost=2.0; geometry=1.5*2.0=3.0.
+      exp(-compact)=0.38289288597511206; exp(-geometry)=0.049787068367863944;
+      weight=max(1e-12, exp(-0.96-3.0))=0.019063114291611637.
+      probability=0.019063114291611637/0.42618996811241483=0.04472914830924274 (4.47%).
+    slide_straight_E_W [W+E] -> (1, 2, 4):
+      h_done=10, h_distance=6, h_needed=max(6, 6-10)=6;
+      B=18+1+(1-0)+6=26; compact=0.12*(26-18)=0.96.
+      continues horizontal direction (1, 0), run 1; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.38289288597511206; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-0.96-0.0))=0.38289288597511206.
+      probability=0.38289288597511206/0.42618996811241483=0.8984089599080323 (89.84%).
+    slide_turn_S_W [W+S] -> (1, 1, 3):
+      h_done=10, h_distance=4, h_needed=max(4, 6-10)=4;
+      B=18+1+(1-0)+4=24; compact=0.12*(24-18)=0.72.
+      turn from (1, 0) to (0, -1); preceding run 1, cost 1 + 1/1; turn cost=2.0; geometry=1.5*2.0=3.0.
+      exp(-compact)=0.4867522559599717; exp(-geometry)=0.049787068367863944;
+      weight=max(1e-12, exp(-0.72-3.0))=0.024233967845691123.
+      probability=0.024233967845691123/0.42618996811241483=0.05686189178272494 (5.69%).
+  Normalization: sum weights = 0.019063114291611637 + 0.38289288597511206 + 0.024233967845691123 = 0.42618996811241483;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.860161037286291, u*sum=0.36659200505258605; cumulative weights = [0.019063114291611637, 0.4019560002667237, 0.42618996811241483].
+  Sampled slide_straight_E_W: enters via W, exits via E to (1, 2, 4).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 10; global BFS removed 0 tile possibilities.
+
+Choice 16 | cell (1, 2, 4) | slide_turn_S_W | 1 eligible | sampled 100.0%
+  Position: cell 19 of 26, with 7 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8), (4, 0, 8), (4, 0, 7), (4, 0, 6), (4, 0, 5), (4, 0, 4), (3, 0, 4), (2, 0, 4), (1, 0, 4), (1, 1, 4), (1, 2, 4)]
+  Entering from (1, 1, 4) through W; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_W (N+W), slide_straight_E_W (E+W), slide_turn_S_W (S+W)
+  Rejected by hard filters:
+    slide_turn_N_W: length_lower_bound - the optimistic full-route cell bound exceeds 26 (successor (1, 2, 5), B=28).
+    slide_straight_E_W: length_lower_bound - the optimistic full-route cell bound exceeds 26 (successor (1, 3, 4), B=28).
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_turn_S_W [W+S] -> (1, 2, 3):
+      h_done=11, h_distance=5, h_needed=max(5, 6-11)=5;
+      B=19+1+(1-0)+5=26; compact=0.12*(26-19)=0.84.
+      turn from (1, 0) to (0, -1); preceding run 2, cost 1 + 1/2; turn cost=1.5; geometry=1.5*1.5=2.25.
+      exp(-compact)=0.43171052342907973; exp(-geometry)=0.10539922456186433;
+      weight=max(1e-12, exp(-0.84-2.25))=0.04550195440462157.
+      probability=0.04550195440462157/0.04550195440462157=1.0 (100.00%).
+  Normalization: sum weights = 0.04550195440462157 = 0.04550195440462157;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.603190610968185, u*sum=0.027446351677570185; cumulative weights = [0.04550195440462157].
+  Sampled slide_turn_S_W: enters via W, exits via S to (1, 2, 3).
+  Forced: this is the only eligible tile (100%).
+  Post-selection propagation: local removed 10; global BFS removed 0 tile possibilities.
+
+Choice 17 | cell (1, 2, 3) | slide_straight_N_S | 2 eligible | sampled 95.3%
+  Position: cell 20 of 26, with 6 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8), (4, 0, 8), (4, 0, 7), (4, 0, 6), (4, 0, 5), (4, 0, 4), (3, 0, 4), (2, 0, 4), (1, 0, 4), (1, 1, 4), (1, 2, 4), (1, 2, 3)]
+  Entering from (1, 2, 4) through N; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_E (N+E), slide_straight_N_S (N+S), slide_turn_N_W (N+W)
+  Rejected by hard filters:
+    slide_turn_N_E: length_lower_bound - the optimistic full-route cell bound exceeds 26 (successor (1, 3, 3), B=28).
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_straight_N_S [N+S] -> (1, 2, 2):
+      h_done=12, h_distance=4, h_needed=max(4, 6-12)=4;
+      B=20+1+(1-0)+4=26; compact=0.12*(26-20)=0.72.
+      continues horizontal direction (0, -1), run 1; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.4867522559599717; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-0.72-0.0))=0.4867522559599717.
+      probability=0.4867522559599717/0.5109862238056628=0.9525741268224331 (95.26%).
+    slide_turn_N_W [N+W] -> (1, 1, 3):
+      h_done=12, h_distance=4, h_needed=max(4, 6-12)=4;
+      B=20+1+(1-0)+4=26; compact=0.12*(26-20)=0.72.
+      turn from (0, -1) to (-1, 0); preceding run 1, cost 1 + 1/1; turn cost=2.0; geometry=1.5*2.0=3.0.
+      exp(-compact)=0.4867522559599717; exp(-geometry)=0.049787068367863944;
+      weight=max(1e-12, exp(-0.72-3.0))=0.024233967845691123.
+      probability=0.024233967845691123/0.5109862238056628=0.04742587317756679 (4.74%).
+  Normalization: sum weights = 0.4867522559599717 + 0.024233967845691123 = 0.5109862238056628;
+    sum probabilities = 0.9999999999999999 (100% within floating-point rounding).
+  Independent RNG replay: u=0.3816059859191179, u*sum=0.194995401726447; cumulative weights = [0.4867522559599717, 0.5109862238056628].
+  Sampled slide_straight_N_S: enters via N, exits via S to (1, 2, 2).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 9; global BFS removed 0 tile possibilities.
+
+Choice 18 | cell (1, 2, 2) | slide_straight_N_S | 2 eligible | sampled 90.5%
+  Position: cell 21 of 26, with 5 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8), (4, 0, 8), (4, 0, 7), (4, 0, 6), (4, 0, 5), (4, 0, 4), (3, 0, 4), (2, 0, 4), (1, 0, 4), (1, 1, 4), (1, 2, 4), (1, 2, 3), (1, 2, 2)]
+  Entering from (1, 2, 3) through N; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_E (N+E), slide_straight_N_S (N+S), slide_turn_N_W (N+W)
+  Rejected by hard filters:
+    slide_turn_N_E: length_lower_bound - the optimistic full-route cell bound exceeds 26 (successor (1, 3, 2), B=28).
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_straight_N_S [N+S] -> (1, 2, 1):
+      h_done=13, h_distance=3, h_needed=max(3, 6-13)=3;
+      B=21+1+(1-0)+3=26; compact=0.12*(26-21)=0.6.
+      continues horizontal direction (0, -1), run 2; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.5488116360940265; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-0.6-0.0))=0.5488116360940265.
+      probability=0.5488116360940265/0.606655956968865=0.9046505351008904 (90.47%).
+    slide_turn_N_W [N+W] -> (1, 1, 2):
+      h_done=13, h_distance=3, h_needed=max(3, 6-13)=3;
+      B=21+1+(1-0)+3=26; compact=0.12*(26-21)=0.6.
+      turn from (0, -1) to (-1, 0); preceding run 2, cost 1 + 1/2; turn cost=1.5; geometry=1.5*1.5=2.25.
+      exp(-compact)=0.5488116360940265; exp(-geometry)=0.10539922456186433;
+      weight=max(1e-12, exp(-0.6-2.25))=0.057844320874838456.
+      probability=0.057844320874838456/0.606655956968865=0.09534946489910946 (9.53%).
+  Normalization: sum weights = 0.5488116360940265 + 0.057844320874838456 = 0.606655956968865;
+    sum probabilities = 0.9999999999999999 (100% within floating-point rounding).
+  Independent RNG replay: u=0.28361821790671515, u*sum=0.17205868139800237; cumulative weights = [0.5488116360940265, 0.606655956968865].
+  Sampled slide_straight_N_S: enters via N, exits via S to (1, 2, 1).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 10; global BFS removed 0 tile possibilities.
+
+Choice 19 | cell (1, 2, 1) | slide_straight_N_S | 2 eligible | sampled 88.1%
+  Position: cell 22 of 26, with 4 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8), (4, 0, 8), (4, 0, 7), (4, 0, 6), (4, 0, 5), (4, 0, 4), (3, 0, 4), (2, 0, 4), (1, 0, 4), (1, 1, 4), (1, 2, 4), (1, 2, 3), (1, 2, 2), (1, 2, 1)]
+  Entering from (1, 2, 2) through N; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_E (N+E), slide_straight_N_S (N+S), slide_turn_N_W (N+W)
+  Rejected by hard filters:
+    slide_turn_N_E: length_lower_bound - the optimistic full-route cell bound exceeds 26 (successor (1, 3, 1), B=28).
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_straight_N_S [N+S] -> (1, 2, 0):
+      h_done=14, h_distance=2, h_needed=max(2, 6-14)=2;
+      B=22+1+(1-0)+2=26; compact=0.12*(26-22)=0.48.
+      continues horizontal direction (0, -1), run 3; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.6187833918061408; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-0.48-0.0))=0.6187833918061408.
+      probability=0.6187833918061408/0.7025266173983368=0.8807970779778824 (88.08%).
+    slide_turn_N_W [N+W] -> (1, 1, 1):
+      h_done=14, h_distance=2, h_needed=max(2, 6-14)=2;
+      B=22+1+(1-0)+2=26; compact=0.12*(26-22)=0.48.
+      turn from (0, -1) to (-1, 0); preceding run 3, cost 1 + 1/3; turn cost=1.3333333333333333; geometry=1.5*1.3333333333333333=2.0.
+      exp(-compact)=0.6187833918061408; exp(-geometry)=0.1353352832366127;
+      weight=max(1e-12, exp(-0.48-2.0))=0.08374322559219596.
+      probability=0.08374322559219596/0.7025266173983368=0.11920292202211757 (11.92%).
+  Normalization: sum weights = 0.6187833918061408 + 0.08374322559219596 = 0.7025266173983368;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.674964847134956, u*sum=0.4741807709205061; cumulative weights = [0.6187833918061408, 0.7025266173983368].
+  Sampled slide_straight_N_S: enters via N, exits via S to (1, 2, 0).
+  Stochastic: multiple eligible tiles had positive weights; a lower-probability tile can be sampled.
+  Post-selection propagation: local removed 8; global BFS removed 0 tile possibilities.
+
+Choice 20 | cell (1, 2, 0) | slide_turn_N_W | 1 eligible | sampled 100.0%
+  Position: cell 23 of 26, with 3 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8), (4, 0, 8), (4, 0, 7), (4, 0, 6), (4, 0, 5), (4, 0, 4), (3, 0, 4), (2, 0, 4), (1, 0, 4), (1, 1, 4), (1, 2, 4), (1, 2, 3), (1, 2, 2), (1, 2, 1), (1, 2, 0)]
+  Entering from (1, 2, 1) through N; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_E (N+E), slide_turn_N_W (N+W)
+  Rejected by hard filters:
+    slide_turn_N_E: length_lower_bound - the optimistic full-route cell bound exceeds 26 (successor (1, 3, 0), B=28).
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_turn_N_W [N+W] -> (1, 1, 0):
+      h_done=15, h_distance=1, h_needed=max(1, 6-15)=1;
+      B=23+1+(1-0)+1=26; compact=0.12*(26-23)=0.36.
+      turn from (0, -1) to (-1, 0); preceding run 4, cost 1 + 1/4; turn cost=1.25; geometry=1.5*1.25=1.875.
+      exp(-compact)=0.697676326071031; exp(-geometry)=0.15335496684492847;
+      weight=max(1e-12, exp(-0.36-1.875))=0.10699212985311449.
+      probability=0.10699212985311449/0.10699212985311449=1.0 (100.00%).
+  Normalization: sum weights = 0.10699212985311449 = 0.10699212985311449;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.45683115105830563, u*sum=0.048877337834977996; cumulative weights = [0.10699212985311449].
+  Sampled slide_turn_N_W: enters via N, exits via W to (1, 1, 0).
+  Forced: this is the only eligible tile (100%).
+  Post-selection propagation: local removed 4; global BFS removed 4245 tile possibilities.
+
+Choice 21 | cell (1, 1, 0) | slide_straight_E_W | 1 eligible | sampled 100.0%
+  Position: cell 24 of 26, with 2 cells after it in the accepted route.
+  Committed prefix (including frontier): [(9, 0, 12), (8, 0, 12), (8, 0, 11), (8, 0, 10), (7, 0, 10), (7, 0, 9), (7, 0, 8), (6, 0, 8), (5, 0, 8), (4, 0, 8), (4, 0, 7), (4, 0, 6), (4, 0, 5), (4, 0, 4), (3, 0, 4), (2, 0, 4), (1, 0, 4), (1, 1, 4), (1, 2, 4), (1, 2, 3), (1, 2, 2), (1, 2, 1), (1, 2, 0), (1, 1, 0)]
+  Entering from (1, 2, 0) through E; end = (0, 0, 0).
+  Domain before candidate filters: slide_turn_N_E (N+E), slide_straight_E_W (E+W)
+  Rejected by hard filters:
+    slide_turn_N_E: length_lower_bound - the optimistic full-route cell bound exceeds 26 (successor (1, 1, 1), B=28).
+  Eligible candidates (all costs and weights from the actual replay):
+    slide_straight_E_W [E+W] -> (1, 0, 0):
+      h_done=16, h_distance=0, h_needed=max(0, 6-16)=0;
+      B=24+1+(1-0)+0=26; compact=0.12*(26-24)=0.24.
+      continues horizontal direction (-1, 0), run 1; turn cost=0.0; geometry=1.5*0.0=0.0.
+      exp(-compact)=0.7866278610665535; exp(-geometry)=1.0;
+      weight=max(1e-12, exp(-0.24-0.0))=0.7866278610665535.
+      probability=0.7866278610665535/0.7866278610665535=1.0 (100.00%).
+  Normalization: sum weights = 0.7866278610665535 = 0.7866278610665535;
+    sum probabilities = 1.0 (100% within floating-point rounding).
+  Independent RNG replay: u=0.6858614854745947, u*sum=0.5395177533068094; cumulative weights = [0.7866278610665535].
+  Sampled slide_straight_E_W: enters via E, exits via W to (1, 0, 0).
+  Forced: this is the only eligible tile (100%).
+  Post-selection propagation: local removed 5; global BFS removed 10 tile possibilities.

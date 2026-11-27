@@ -3,6 +3,7 @@ import random
 import unittest
 from unittest.mock import patch
 
+from src.wfc_building import build_route_tiles
 from src.wfc_solver import _select_route_tile, solve_wfc
 from src.wfc_tiles import (
     ContradictionError,
@@ -22,6 +23,12 @@ def tile(name, **ports):
 
 
 class SolveWfcTests(unittest.TestCase):
+    def test_removed_routing_strategies_are_rejected(self):
+        for strategy in ("pure_dfs", "incremental_frontier"):
+            with self.subTest(strategy=strategy):
+                with self.assertRaisesRegex(ValueError, "dfs_guided"):
+                    solve_wfc([], [], routing_strategy=strategy)
+
     def test_fixed_tile_propagates_to_compatible_neighbor(self):
         tiles = [
             tile("empty"),
@@ -48,6 +55,20 @@ class SolveWfcTests(unittest.TestCase):
         second = solve_wfc(cells, tiles, seed=19)
 
         self.assertEqual(first, second)
+
+    def test_optional_trace_does_not_change_seeded_layout(self):
+        tiles = [tile("first"), tile("second"), tile("third")]
+        cells = [(0, x, 0) for x in range(8)]
+        events = []
+
+        baseline = solve_wfc(cells, tiles, seed=19)
+        traced = solve_wfc(cells, tiles, seed=19, trace_callback=events.append)
+
+        self.assertEqual(traced, baseline)
+        event_types = {event["event"] for event in events}
+        self.assertIn("solver_attempt_start", event_types)
+        self.assertIn("collapse_selected", event_types)
+        self.assertIn("solver_solution", event_types)
 
     def test_trace_is_emitted_for_the_successful_run(self):
         tiles = [tile("first"), tile("second"), tile("third")]
@@ -286,6 +307,43 @@ class SolveWfcTests(unittest.TestCase):
         self.assertEqual(propagation.call_count, 2)
         self.assertEqual(choice[0], middle)
         self.assertNotEqual(choice[1], rejected_candidate[0])
+
+    def test_lookahead_preserves_rng_state_for_single_dfs_candidate(self):
+        start, middle, end = (0, 0, 0), (0, 1, 0), (0, 2, 0)
+        tiles = [
+            tile("start", E="SLIDE"),
+            tile("end", W="SLIDE"),
+            tile("middle", W="SLIDE", E="SLIDE"),
+        ]
+        domains = {start: {0}, middle: {2}, end: {1}}
+        baseline_rng = random.Random(11)
+        lookahead_rng = random.Random(11)
+        arguments = (
+            domains,
+            tiles,
+            [(start, end, PortKind.SLIDE)],
+        )
+        keywords = {
+            "required_horizontal_steps": 0,
+            "compatibility": build_compatibility(tiles),
+        }
+
+        baseline = _select_route_tile(
+            *arguments,
+            baseline_rng,
+            phase_counts=Counter(),
+            **keywords,
+        )
+        lookahead = _select_route_tile(
+            *arguments,
+            lookahead_rng,
+            candidate_lookahead=True,
+            phase_counts=Counter(),
+            **keywords,
+        )
+
+        self.assertEqual(lookahead, baseline)
+        self.assertEqual(lookahead_rng.getstate(), baseline_rng.getstate())
 
     def test_local_propagation_failure_reports_initial_stage(self):
         cells = [(0, 0, 0), (0, 1, 0)]

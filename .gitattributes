@@ -1,0 +1,9 @@
+# Preserve byte-for-byte upstream sources and delivered JSON/trace on checkout.
+src/graph.py text eol=lf
+src/human.py text eol=lf
+results/final/building/building_seed10_hybrid.json text eol=lf
+results/final/algorithm/wfc_decisions.txt text eol=lf
+results/final/algorithm/wfc_decisions_explained.txt text eol=lf
+results/final/res2/*.json text eol=lf
+results/final/res2/*.txt text eol=lf
+results/final_buildings/building_seed10_res3.json text eol=lf

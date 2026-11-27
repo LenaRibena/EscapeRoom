@@ -1,0 +1,6529 @@
+{
+  "schema_version": 1,
+  "coordinate_system": {
+    "axis_order": "x,y,z",
+    "up_axis": "z",
+    "unit": "graph_unit",
+    "blender_units_per_graph_unit": 1.0,
+    "origin": [
+      0,
+      0,
+      0
+    ]
+  },
+  "generation": {
+    "seed": 10,
+    "requested_seed": 10,
+    "accepted_seed": 10,
+    "building_retry_count": 0,
+    "grid_resolution": 3,
+    "vertical_grid_resolution": 3
+  },
+  "building": {
+    "floors": 5,
+    "length": 5,
+    "width": 5,
+    "floor_elevations": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "start": [
+      4,
+      4,
+      4
+    ],
+    "exit": [
+      0,
+      0,
+      0
+    ]
+  },
+  "graph": {
+    "nodes": [
+      {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "attributes": {
+          "type": "slide_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          0,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          0,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          0,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          0,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          0,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          1,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          1,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          1,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          2,
+          0
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          0,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "slide_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          2,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          2,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          2,
+          4
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          0,
+          3,
+          0
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          0,
+          3,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          0,
+          3,
+          2
+        ],
+        "attributes": {
+          "type": "stair_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          3,
+          4
+        ],
+        "attributes": {
+          "type": "stair_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          4,
+          0
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          0,
+          4,
+          1
+        ],
+        "attributes": {
+          "type": "slide_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          4,
+          2
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          0,
+          4,
+          3
+        ],
+        "attributes": {
+          "type": "slide_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          0,
+          4,
+          4
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          1,
+          0,
+          0
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          1,
+          0,
+          1
+        ],
+        "attributes": {
+          "type": "slide_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          1,
+          0,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          1,
+          0,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          1,
+          0,
+          4
+        ],
+        "attributes": {
+          "type": "slide_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          1,
+          1,
+          0
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          1,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          1,
+          1,
+          2
+        ],
+        "attributes": {
+          "type": "slide_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          1,
+          1,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          1,
+          1,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          1,
+          2,
+          0
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          1,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          1,
+          2,
+          2
+        ],
+        "attributes": {
+          "type": "slide_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          1,
+          2,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          1,
+          2,
+          4
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          1,
+          3,
+          0
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          1,
+          3,
+          1
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          1,
+          3,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          1,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          1,
+          3,
+          4
+        ],
+        "attributes": {
+          "type": "slide_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          1,
+          4,
+          0
+        ],
+        "attributes": {
+          "type": "stair_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          1,
+          4,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          1,
+          4,
+          2
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          1,
+          4,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          1,
+          4,
+          4
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          2,
+          0,
+          0
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          2,
+          0,
+          1
+        ],
+        "attributes": {
+          "type": "stair_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          0,
+          2
+        ],
+        "attributes": {
+          "type": "slide_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          0,
+          3
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          2,
+          0,
+          4
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          2,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "stair_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          1,
+          2
+        ],
+        "attributes": {
+          "type": "slide_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          1,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          1,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          2,
+          0
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          2,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          2,
+          2
+        ],
+        "attributes": {
+          "type": "slide_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          2,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          2,
+          4
+        ],
+        "attributes": {
+          "type": "slide_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          3,
+          0
+        ],
+        "attributes": {
+          "type": "slide_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          3,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          3,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          3,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          4,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          4,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          4,
+          2
+        ],
+        "attributes": {
+          "type": "slide_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          2,
+          4,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          2,
+          4,
+          4
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          3,
+          0,
+          0
+        ],
+        "attributes": {
+          "type": "slide_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          0,
+          1
+        ],
+        "attributes": {
+          "type": "slide_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          0,
+          2
+        ],
+        "attributes": {
+          "type": "stair_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          0,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          0,
+          4
+        ],
+        "attributes": {
+          "type": "stair_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          1,
+          0
+        ],
+        "attributes": {
+          "type": "stair_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          1,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          1,
+          3
+        ],
+        "attributes": {
+          "type": "stair_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          1,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          2,
+          0
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          3,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          2,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          2,
+          3
+        ],
+        "attributes": {
+          "type": "slide_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          2,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          3,
+          0
+        ],
+        "attributes": {
+          "type": "slide_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          3,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          3,
+          2
+        ],
+        "attributes": {
+          "type": "slide_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "slide_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          3,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          4,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          4,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          3,
+          4,
+          2
+        ],
+        "attributes": {
+          "type": "slide_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          4,
+          3
+        ],
+        "attributes": {
+          "type": "slide_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          3,
+          4,
+          4
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          4,
+          0,
+          0
+        ],
+        "attributes": {
+          "type": "stair_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          0,
+          1
+        ],
+        "attributes": {
+          "type": "stair_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          0,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          0,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          0,
+          4
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          4,
+          1,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          1,
+          2
+        ],
+        "attributes": {
+          "type": "stair_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          1,
+          3
+        ],
+        "attributes": {
+          "type": "stair_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          1,
+          4
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          4,
+          2,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "stair_tail",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          2,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          2,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          2,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          3,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          3,
+          1
+        ],
+        "attributes": {
+          "type": "slide_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          3,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          3,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          4,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          4,
+          1
+        ],
+        "attributes": {
+          "type": "wall",
+          "dead_end": true
+        }
+      },
+      {
+        "position": [
+          4,
+          4,
+          2
+        ],
+        "attributes": {
+          "type": "stair_head",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          4,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "dead_end": false
+        }
+      },
+      {
+        "position": [
+          4,
+          4,
+          4
+        ],
+        "attributes": {
+          "type": "stair_tail",
+          "dead_end": false
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source": [
+          0,
+          0,
+          1
+        ],
+        "target": [
+          1,
+          0,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          0,
+          1
+        ],
+        "target": [
+          0,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          0,
+          2
+        ],
+        "target": [
+          1,
+          0,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          0,
+          2
+        ],
+        "target": [
+          0,
+          1,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          0,
+          3
+        ],
+        "target": [
+          0,
+          1,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          0,
+          3
+        ],
+        "target": [
+          1,
+          0,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          0,
+          4
+        ],
+        "target": [
+          0,
+          1,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          0,
+          4
+        ],
+        "target": [
+          1,
+          0,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          1,
+          1
+        ],
+        "target": [
+          0,
+          0,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          1,
+          1
+        ],
+        "target": [
+          1,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          1,
+          1
+        ],
+        "target": [
+          0,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          1,
+          2
+        ],
+        "target": [
+          0,
+          0,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          1,
+          2
+        ],
+        "target": [
+          0,
+          2,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          1,
+          3
+        ],
+        "target": [
+          0,
+          2,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          1,
+          3
+        ],
+        "target": [
+          0,
+          0,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          1,
+          4
+        ],
+        "target": [
+          1,
+          1,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          1,
+          4
+        ],
+        "target": [
+          0,
+          0,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          2,
+          1
+        ],
+        "target": [
+          0,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          2,
+          2
+        ],
+        "target": [
+          0,
+          1,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          2,
+          2
+        ],
+        "target": [
+          0,
+          3,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          2,
+          3
+        ],
+        "target": [
+          0,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          2,
+          3
+        ],
+        "target": [
+          0,
+          1,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          3,
+          1
+        ],
+        "target": [
+          0,
+          4,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          3,
+          2
+        ],
+        "target": [
+          0,
+          3,
+          4
+        ],
+        "attributes": {
+          "type": "stair",
+          "kind": "stair"
+        }
+      },
+      {
+        "source": [
+          0,
+          3,
+          3
+        ],
+        "target": [
+          1,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          3,
+          3
+        ],
+        "target": [
+          0,
+          4,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          3,
+          3
+        ],
+        "target": [
+          0,
+          2,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          3,
+          4
+        ],
+        "target": [
+          1,
+          3,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          4,
+          1
+        ],
+        "target": [
+          1,
+          4,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          4,
+          1
+        ],
+        "target": [
+          0,
+          3,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          0,
+          4,
+          3
+        ],
+        "target": [
+          0,
+          4,
+          1
+        ],
+        "attributes": {
+          "type": "slide",
+          "kind": "slide"
+        }
+      },
+      {
+        "source": [
+          1,
+          0,
+          1
+        ],
+        "target": [
+          0,
+          0,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          0,
+          2
+        ],
+        "target": [
+          1,
+          1,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          0,
+          2
+        ],
+        "target": [
+          0,
+          0,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          0,
+          3
+        ],
+        "target": [
+          0,
+          0,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          0,
+          4
+        ],
+        "target": [
+          1,
+          1,
+          2
+        ],
+        "attributes": {
+          "type": "slide",
+          "kind": "slide"
+        }
+      },
+      {
+        "source": [
+          1,
+          1,
+          1
+        ],
+        "target": [
+          0,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          1,
+          1
+        ],
+        "target": [
+          2,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          1,
+          1
+        ],
+        "target": [
+          1,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          1,
+          2
+        ],
+        "target": [
+          1,
+          0,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          1,
+          3
+        ],
+        "target": [
+          2,
+          1,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          1,
+          4
+        ],
+        "target": [
+          2,
+          1,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          1,
+          4
+        ],
+        "target": [
+          0,
+          1,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          2,
+          1
+        ],
+        "target": [
+          2,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          2,
+          1
+        ],
+        "target": [
+          1,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          2,
+          2
+        ],
+        "target": [
+          1,
+          3,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          2,
+          3
+        ],
+        "target": [
+          2,
+          2,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          3,
+          2
+        ],
+        "target": [
+          1,
+          2,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          3,
+          2
+        ],
+        "target": [
+          2,
+          3,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          3,
+          3
+        ],
+        "target": [
+          2,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          3,
+          3
+        ],
+        "target": [
+          1,
+          4,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          3,
+          3
+        ],
+        "target": [
+          0,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          3,
+          4
+        ],
+        "target": [
+          1,
+          2,
+          2
+        ],
+        "attributes": {
+          "type": "slide",
+          "kind": "slide"
+        }
+      },
+      {
+        "source": [
+          1,
+          4,
+          0
+        ],
+        "target": [
+          2,
+          0,
+          1
+        ],
+        "attributes": {
+          "type": "stair",
+          "kind": "stair"
+        }
+      },
+      {
+        "source": [
+          1,
+          4,
+          1
+        ],
+        "target": [
+          0,
+          4,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          4,
+          1
+        ],
+        "target": [
+          2,
+          4,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          1,
+          4,
+          3
+        ],
+        "target": [
+          1,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          0,
+          1
+        ],
+        "target": [
+          2,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          0,
+          1
+        ],
+        "target": [
+          3,
+          0,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          0,
+          2
+        ],
+        "target": [
+          2,
+          1,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          1,
+          1
+        ],
+        "target": [
+          1,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          1,
+          1
+        ],
+        "target": [
+          2,
+          0,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          1,
+          2
+        ],
+        "target": [
+          1,
+          0,
+          1
+        ],
+        "attributes": {
+          "type": "slide",
+          "kind": "slide"
+        }
+      },
+      {
+        "source": [
+          2,
+          1,
+          3
+        ],
+        "target": [
+          2,
+          2,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          1,
+          3
+        ],
+        "target": [
+          1,
+          1,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          1,
+          4
+        ],
+        "target": [
+          3,
+          1,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          1,
+          4
+        ],
+        "target": [
+          1,
+          1,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          2,
+          1
+        ],
+        "target": [
+          2,
+          3,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          2,
+          1
+        ],
+        "target": [
+          1,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          2,
+          1
+        ],
+        "target": [
+          3,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          2,
+          2
+        ],
+        "target": [
+          0,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "slide",
+          "kind": "slide"
+        }
+      },
+      {
+        "source": [
+          2,
+          2,
+          3
+        ],
+        "target": [
+          2,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          2,
+          3
+        ],
+        "target": [
+          2,
+          1,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          2,
+          3
+        ],
+        "target": [
+          1,
+          2,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          2,
+          4
+        ],
+        "target": [
+          3,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "slide",
+          "kind": "slide"
+        }
+      },
+      {
+        "source": [
+          2,
+          3,
+          0
+        ],
+        "target": [
+          2,
+          4,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          3,
+          1
+        ],
+        "target": [
+          2,
+          4,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          3,
+          1
+        ],
+        "target": [
+          2,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          3,
+          2
+        ],
+        "target": [
+          1,
+          3,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          3,
+          2
+        ],
+        "target": [
+          2,
+          4,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          3,
+          3
+        ],
+        "target": [
+          3,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          3,
+          3
+        ],
+        "target": [
+          2,
+          4,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          3,
+          3
+        ],
+        "target": [
+          2,
+          2,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          3,
+          3
+        ],
+        "target": [
+          1,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          3,
+          4
+        ],
+        "target": [
+          3,
+          3,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          3,
+          4
+        ],
+        "target": [
+          2,
+          2,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          4,
+          0
+        ],
+        "target": [
+          2,
+          3,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          4,
+          0
+        ],
+        "target": [
+          1,
+          4,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          4,
+          1
+        ],
+        "target": [
+          1,
+          4,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          4,
+          1
+        ],
+        "target": [
+          2,
+          3,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          2,
+          4,
+          2
+        ],
+        "target": [
+          2,
+          3,
+          0
+        ],
+        "attributes": {
+          "type": "slide",
+          "kind": "slide"
+        }
+      },
+      {
+        "source": [
+          2,
+          4,
+          3
+        ],
+        "target": [
+          2,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          0,
+          0
+        ],
+        "target": [
+          3,
+          1,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          0,
+          1
+        ],
+        "target": [
+          3,
+          0,
+          0
+        ],
+        "attributes": {
+          "type": "slide",
+          "kind": "slide"
+        }
+      },
+      {
+        "source": [
+          3,
+          0,
+          2
+        ],
+        "target": [
+          3,
+          1,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          0,
+          2
+        ],
+        "target": [
+          4,
+          0,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          0,
+          3
+        ],
+        "target": [
+          4,
+          0,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          0,
+          3
+        ],
+        "target": [
+          3,
+          1,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          0,
+          4
+        ],
+        "target": [
+          3,
+          1,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          1,
+          0
+        ],
+        "target": [
+          4,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "stair",
+          "kind": "stair"
+        }
+      },
+      {
+        "source": [
+          3,
+          1,
+          1
+        ],
+        "target": [
+          3,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          1,
+          1
+        ],
+        "target": [
+          4,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          1,
+          2
+        ],
+        "target": [
+          3,
+          0,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          1,
+          2
+        ],
+        "target": [
+          3,
+          2,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          1,
+          3
+        ],
+        "target": [
+          3,
+          0,
+          4
+        ],
+        "attributes": {
+          "type": "stair",
+          "kind": "stair"
+        }
+      },
+      {
+        "source": [
+          3,
+          1,
+          4
+        ],
+        "target": [
+          3,
+          0,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          1,
+          4
+        ],
+        "target": [
+          2,
+          1,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          1,
+          4
+        ],
+        "target": [
+          3,
+          2,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          2,
+          1
+        ],
+        "target": [
+          2,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          2,
+          1
+        ],
+        "target": [
+          3,
+          3,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          2,
+          1
+        ],
+        "target": [
+          3,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          2,
+          2
+        ],
+        "target": [
+          3,
+          1,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          2,
+          2
+        ],
+        "target": [
+          2,
+          2,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          2,
+          2
+        ],
+        "target": [
+          4,
+          2,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          2,
+          3
+        ],
+        "target": [
+          2,
+          0,
+          2
+        ],
+        "attributes": {
+          "type": "slide",
+          "kind": "slide"
+        }
+      },
+      {
+        "source": [
+          3,
+          2,
+          4
+        ],
+        "target": [
+          3,
+          1,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          2,
+          4
+        ],
+        "target": [
+          4,
+          2,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          3,
+          0
+        ],
+        "target": [
+          3,
+          4,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          3,
+          1
+        ],
+        "target": [
+          3,
+          2,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          3,
+          1
+        ],
+        "target": [
+          3,
+          4,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          3,
+          2
+        ],
+        "target": [
+          3,
+          4,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          3,
+          3
+        ],
+        "target": [
+          3,
+          2,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          3,
+          3
+        ],
+        "target": [
+          2,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          3,
+          4
+        ],
+        "target": [
+          4,
+          3,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          3,
+          4
+        ],
+        "target": [
+          2,
+          3,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          4,
+          0
+        ],
+        "target": [
+          3,
+          3,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          4,
+          0
+        ],
+        "target": [
+          4,
+          4,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          4,
+          1
+        ],
+        "target": [
+          3,
+          3,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          3,
+          4,
+          2
+        ],
+        "target": [
+          3,
+          3,
+          0
+        ],
+        "attributes": {
+          "type": "slide",
+          "kind": "slide"
+        }
+      },
+      {
+        "source": [
+          3,
+          4,
+          3
+        ],
+        "target": [
+          3,
+          3,
+          2
+        ],
+        "attributes": {
+          "type": "slide",
+          "kind": "slide"
+        }
+      },
+      {
+        "source": [
+          4,
+          0,
+          0
+        ],
+        "target": [
+          2,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "stair",
+          "kind": "stair"
+        }
+      },
+      {
+        "source": [
+          4,
+          0,
+          1
+        ],
+        "target": [
+          3,
+          0,
+          2
+        ],
+        "attributes": {
+          "type": "stair",
+          "kind": "stair"
+        }
+      },
+      {
+        "source": [
+          4,
+          0,
+          2
+        ],
+        "target": [
+          3,
+          0,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          0,
+          2
+        ],
+        "target": [
+          4,
+          1,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          0,
+          3
+        ],
+        "target": [
+          4,
+          1,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          0,
+          3
+        ],
+        "target": [
+          3,
+          0,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          1,
+          0
+        ],
+        "target": [
+          4,
+          2,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          1,
+          0
+        ],
+        "target": [
+          4,
+          0,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          1,
+          1
+        ],
+        "target": [
+          3,
+          1,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          1,
+          1
+        ],
+        "target": [
+          4,
+          0,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          1,
+          2
+        ],
+        "target": [
+          4,
+          1,
+          3
+        ],
+        "attributes": {
+          "type": "stair",
+          "kind": "stair"
+        }
+      },
+      {
+        "source": [
+          4,
+          1,
+          3
+        ],
+        "target": [
+          4,
+          0,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          1,
+          3
+        ],
+        "target": [
+          4,
+          2,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          2,
+          0
+        ],
+        "target": [
+          4,
+          3,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          2,
+          0
+        ],
+        "target": [
+          4,
+          1,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          2,
+          1
+        ],
+        "target": [
+          4,
+          3,
+          1
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          2,
+          2
+        ],
+        "target": [
+          3,
+          2,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          2,
+          2
+        ],
+        "target": [
+          4,
+          3,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          2,
+          3
+        ],
+        "target": [
+          4,
+          1,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          2,
+          3
+        ],
+        "target": [
+          4,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          2,
+          4
+        ],
+        "target": [
+          3,
+          2,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          2,
+          4
+        ],
+        "target": [
+          4,
+          3,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          3,
+          0
+        ],
+        "target": [
+          4,
+          4,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          3,
+          0
+        ],
+        "target": [
+          4,
+          2,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          3,
+          1
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "attributes": {
+          "type": "slide",
+          "kind": "slide"
+        }
+      },
+      {
+        "source": [
+          4,
+          3,
+          2
+        ],
+        "target": [
+          4,
+          2,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          3,
+          2
+        ],
+        "target": [
+          4,
+          4,
+          2
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          3,
+          3
+        ],
+        "target": [
+          4,
+          2,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          3,
+          3
+        ],
+        "target": [
+          4,
+          4,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          3,
+          4
+        ],
+        "target": [
+          4,
+          4,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          3,
+          4
+        ],
+        "target": [
+          3,
+          3,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          3,
+          4
+        ],
+        "target": [
+          4,
+          2,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          4,
+          0
+        ],
+        "target": [
+          3,
+          4,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          4,
+          0
+        ],
+        "target": [
+          4,
+          3,
+          0
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          4,
+          2
+        ],
+        "target": [
+          4,
+          4,
+          4
+        ],
+        "attributes": {
+          "type": "stair",
+          "kind": "stair"
+        }
+      },
+      {
+        "source": [
+          4,
+          4,
+          3
+        ],
+        "target": [
+          4,
+          3,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          4,
+          3
+        ],
+        "target": [
+          3,
+          4,
+          3
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      },
+      {
+        "source": [
+          4,
+          4,
+          4
+        ],
+        "target": [
+          4,
+          3,
+          4
+        ],
+        "attributes": {
+          "type": "floor",
+          "kind": "floor"
+        }
+      }
+    ],
+    "solution_path": [
+      [
+        4,
+        4,
+        4
+      ],
+      [
+        4,
+        3,
+        4
+      ],
+      [
+        3,
+        3,
+        4
+      ],
+      [
+        2,
+        3,
+        4
+      ],
+      [
+        2,
+        2,
+        4
+      ],
+      [
+        3,
+        3,
+        3
+      ],
+      [
+        3,
+        2,
+        3
+      ],
+      [
+        2,
+        0,
+        2
+      ],
+      [
+        2,
+        1,
+        2
+      ],
+      [
+        1,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1
+      ],
+      [
+        2,
+        1,
+        1
+      ],
+      [
+        2,
+        0,
+        1
+      ],
+      [
+        3,
+        0,
+        1
+      ],
+      [
+        3,
+        0,
+        0
+      ],
+      [
+        3,
+        1,
+        0
+      ],
+      [
+        4,
+        2,
+        1
+      ],
+      [
+        4,
+        3,
+        1
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ]
+  },
+  "routes": [
+    {
+      "id": "0:(1, 0, 4)->(1, 1, 2):slide",
+      "type": "slide",
+      "source": [
+        1,
+        0,
+        4
+      ],
+      "target": [
+        1,
+        1,
+        2
+      ],
+      "geometry": [
+        [
+          1.0,
+          0.0,
+          4.0
+        ],
+        [
+          1.0,
+          0.125,
+          3.854018730492487
+        ],
+        [
+          1.0,
+          0.25,
+          3.708037460984974
+        ],
+        [
+          1.0,
+          0.375,
+          3.5620561914774616
+        ],
+        [
+          1.0,
+          0.5,
+          3.4160749219699484
+        ],
+        [
+          1.0,
+          0.625,
+          3.2700936524624353
+        ],
+        [
+          1.0,
+          0.75,
+          3.1241123829549227
+        ],
+        [
+          1.0,
+          0.875,
+          2.97813111344741
+        ],
+        [
+          1.0,
+          1.0,
+          2.832149843939897
+        ],
+        [
+          0.9697265625,
+          1.0478515625,
+          2.7660217475431104
+        ],
+        [
+          0.9244791666666667,
+          1.0703125,
+          2.707027157467242
+        ],
+        [
+          0.8701171875,
+          1.0732421875,
+          2.643448384075006
+        ],
+        [
+          0.8125,
+          1.0625,
+          2.5750006586548224
+        ],
+        [
+          0.7574869791666665,
+          1.0439453125,
+          2.5071978403352455
+        ],
+        [
+          0.7109375,
+          1.0234375,
+          2.447793119891528
+        ],
+        [
+          0.6787109374999999,
+          1.0068359375,
+          2.405456929532841
+        ],
+        [
+          0.6666666666666666,
+          1.0,
+          2.3892833853533677
+        ],
+        [
+          0.7083333333333333,
+          1.0,
+          2.340622962184197
+        ],
+        [
+          0.75,
+          1.0,
+          2.291962539015026
+        ],
+        [
+          0.7916666666666666,
+          1.0,
+          2.2433021158458546
+        ],
+        [
+          0.8333333333333333,
+          1.0,
+          2.194641692676684
+        ],
+        [
+          0.875,
+          1.0,
+          2.145981269507513
+        ],
+        [
+          0.9166666666666666,
+          1.0,
+          2.097320846338342
+        ],
+        [
+          0.9583333333333333,
+          1.0,
+          2.0486604231691707
+        ],
+        [
+          1.0,
+          1.0,
+          2.0
+        ]
+      ]
+    },
+    {
+      "id": "1:(1, 3, 4)->(1, 2, 2):slide",
+      "type": "slide",
+      "source": [
+        1,
+        3,
+        4
+      ],
+      "target": [
+        1,
+        2,
+        2
+      ],
+      "geometry": [
+        [
+          1.0,
+          3.0,
+          4.0
+        ],
+        [
+          1.0,
+          2.875,
+          3.854018730492487
+        ],
+        [
+          1.0,
+          2.75,
+          3.708037460984974
+        ],
+        [
+          1.0,
+          2.625,
+          3.5620561914774616
+        ],
+        [
+          1.0,
+          2.5,
+          3.4160749219699484
+        ],
+        [
+          1.0,
+          2.375,
+          3.2700936524624353
+        ],
+        [
+          1.0,
+          2.25,
+          3.1241123829549227
+        ],
+        [
+          1.0,
+          2.125,
+          2.97813111344741
+        ],
+        [
+          1.0,
+          2.0,
+          2.832149843939897
+        ],
+        [
+          0.9697265625,
+          1.9521484375,
+          2.7660217475431104
+        ],
+        [
+          0.9244791666666667,
+          1.9296875,
+          2.707027157467242
+        ],
+        [
+          0.8701171875,
+          1.9267578125,
+          2.643448384075006
+        ],
+        [
+          0.8125,
+          1.9375,
+          2.5750006586548224
+        ],
+        [
+          0.7574869791666665,
+          1.9560546875,
+          2.5071978403352455
+        ],
+        [
+          0.7109375,
+          1.9765625,
+          2.447793119891528
+        ],
+        [
+          0.6787109374999999,
+          1.9931640625,
+          2.405456929532841
+        ],
+        [
+          0.6666666666666666,
+          2.0,
+          2.3892833853533677
+        ],
+        [
+          0.7083333333333333,
+          2.0,
+          2.340622962184197
+        ],
+        [
+          0.75,
+          2.0,
+          2.291962539015026
+        ],
+        [
+          0.7916666666666666,
+          2.0,
+          2.2433021158458546
+        ],
+        [
+          0.8333333333333333,
+          2.0,
+          2.194641692676684
+        ],
+        [
+          0.875,
+          2.0,
+          2.145981269507513
+        ],
+        [
+          0.9166666666666666,
+          2.0,
+          2.097320846338342
+        ],
+        [
+          0.9583333333333333,
+          2.0,
+          2.0486604231691707
+        ],
+        [
+          1.0,
+          2.0,
+          2.0
+        ]
+      ]
+    },
+    {
+      "id": "2:(2, 4, 2)->(2, 3, 0):slide",
+      "type": "slide",
+      "source": [
+        2,
+        4,
+        2
+      ],
+      "target": [
+        2,
+        3,
+        0
+      ],
+      "geometry": [
+        [
+          2.0,
+          4.0,
+          2.0
+        ],
+        [
+          2.0,
+          3.8333333333333335,
+          1.857817272979728
+        ],
+        [
+          2.0,
+          3.6666666666666665,
+          1.7156345459594555
+        ],
+        [
+          2.0,
+          3.5,
+          1.5734518189391835
+        ],
+        [
+          2.0,
+          3.333333333333333,
+          1.4312690919189113
+        ],
+        [
+          2.0,
+          3.1666666666666665,
+          1.2890863648986393
+        ],
+        [
+          2.0,
+          3.0,
+          1.1469036378783672
+        ],
+        [
+          2.0,
+          2.833333333333333,
+          1.004720910858095
+        ],
+        [
+          2.0,
+          2.6666666666666665,
+          0.8625381838378228
+        ],
+        [
+          2.0,
+          2.6611328125,
+          0.857817272979728
+        ],
+        [
+          2.0,
+          2.716145833333333,
+          0.8108858650374899
+        ],
+        [
+          2.0,
+          2.8141276041666665,
+          0.7272979727853377
+        ],
+        [
+          2.0,
+          2.9375,
+          0.6220494307136908
+        ],
+        [
+          2.0,
+          3.0686848958333335,
+          0.5101360733129687
+        ],
+        [
+          2.0,
+          3.190104166666667,
+          0.4065537350735906
+        ],
+        [
+          2.0,
+          3.284179687500001,
+          0.3262982504859755
+        ],
+        [
+          2.0,
+          3.3333333333333335,
+          0.2843654540405445
+        ],
+        [
+          2.0,
+          3.291666666666667,
+          0.24881977228547658
+        ],
+        [
+          2.0,
+          3.25,
+          0.21327409053040824
+        ],
+        [
+          2.0,
+          3.2083333333333335,
+          0.17772840877534035
+        ],
+        [
+          2.0,
+          3.166666666666667,
+          0.14218272702027246
+        ],
+        [
+          2.0,
+          3.125,
+          0.10663704526520412
+        ],
+        [
+          2.0,
+          3.0833333333333335,
+          0.07109136351013623
+        ],
+        [
+          2.0,
+          3.0416666666666665,
+          0.03554568175506789
+        ],
+        [
+          2.0,
+          3.0,
+          0.0
+        ]
+      ]
+    },
+    {
+      "id": "3:(3, 4, 2)->(3, 3, 0):slide",
+      "type": "slide",
+      "source": [
+        3,
+        4,
+        2
+      ],
+      "target": [
+        3,
+        3,
+        0
+      ],
+      "geometry": [
+        [
+          3.0,
+          4.0,
+          2.0
+        ],
+        [
+          3.0,
+          3.8333333333333335,
+          1.8000000000000003
+        ],
+        [
+          3.0,
+          3.6666666666666665,
+          1.5999999999999999
+        ],
+        [
+          3.0,
+          3.5,
+          1.4000000000000001
+        ],
+        [
+          3.0,
+          3.333333333333333,
+          1.1999999999999997
+        ],
+        [
+          3.0,
+          3.1666666666666665,
+          1.0
+        ],
+        [
+          3.0,
+          3.0,
+          0.8000000000000003
+        ],
+        [
+          3.0,
+          2.833333333333333,
+          0.5999999999999999
+        ],
+        [
+          3.0,
+          2.6666666666666665,
+          0.40000000000000013
+        ],
+        [
+          3.0,
+          2.708333333333333,
+          0.3500000000000003
+        ],
+        [
+          3.0,
+          2.75,
+          0.30000000000000004
+        ],
+        [
+          3.0,
+          2.7916666666666665,
+          0.2500000000000002
+        ],
+        [
+          3.0,
+          2.833333333333333,
+          0.2000000000000004
+        ],
+        [
+          3.0,
+          2.875,
+          0.1499999999999999
+        ],
+        [
+          3.0,
+          2.9166666666666665,
+          0.10000000000000009
+        ],
+        [
+          3.0,
+          2.9583333333333335,
+          0.04999999999999982
+        ],
+        [
+          3.0,
+          3.0,
+          0.0
+        ]
+      ]
+    },
+    {
+      "id": "4:(0, 3, 2)->(0, 3, 4):stair",
+      "type": "stair",
+      "source": [
+        0,
+        3,
+        2
+      ],
+      "target": [
+        0,
+        3,
+        4
+      ],
+      "geometry": [
+        [
+          0.0,
+          3.0,
+          2.0
+        ],
+        [
+          0.0,
+          3.0,
+          4.0
+        ]
+      ]
+    },
+    {
+      "id": "5:(0, 4, 3)->(0, 4, 1):slide",
+      "type": "slide",
+      "source": [
+        0,
+        4,
+        3
+      ],
+      "target": [
+        0,
+        4,
+        1
+      ],
+      "geometry": [
+        [
+          0.0,
+          4.0,
+          3.0
+        ],
+        [
+          0.08333333333333333,
+          4.0,
+          2.9390015076384497
+        ],
+        [
+          0.16666666666666666,
+          4.0,
+          2.8780030152768994
+        ],
+        [
+          0.25,
+          4.0,
+          2.817004522915349
+        ],
+        [
+          0.3333333333333333,
+          4.0,
+          2.7560060305537992
+        ],
+        [
+          0.41666666666666663,
+          4.0,
+          2.695007538192249
+        ],
+        [
+          0.5,
+          4.0,
+          2.6340090458306986
+        ],
+        [
+          0.5833333333333333,
+          4.0,
+          2.5730105534691483
+        ],
+        [
+          0.6666666666666666,
+          4.0,
+          2.512012061107598
+        ],
+        [
+          0.7031249999999999,
+          3.972005208333333,
+          2.4783654202304923
+        ],
+        [
+          0.7291666666666666,
+          3.932291666666667,
+          2.4436033397313155
+        ],
+        [
+          0.7447916666666666,
+          3.884765625,
+          2.4069832771244934
+        ],
+        [
+          0.75,
+          3.833333333333333,
+          2.369143229272768
+        ],
+        [
+          0.7447916666666667,
+          3.781901041666667,
+          2.331303181421043
+        ],
+        [
+          0.7291666666666667,
+          3.734375,
+          2.2946831188142216
+        ],
+        [
+          0.703125,
+          3.694661458333333,
+          2.259921038315044
+        ],
+        [
+          0.6666666666666666,
+          3.6666666666666665,
+          2.226274397437938
+        ],
+        [
+          0.6106770833333334,
+          3.6484374999999996,
+          2.1831735525725735
+        ],
+        [
+          0.5312499999999999,
+          3.6354166666666665,
+          2.124258313278096
+        ],
+        [
+          0.43619791666666663,
+          3.6276041666666665,
+          2.0544472921825254
+        ],
+        [
+          0.33333333333333337,
+          3.625,
+          1.9791281528882703
+        ],
+        [
+          0.23046875000000006,
+          3.627604166666667,
+          1.9038090135940153
+        ],
+        [
+          0.1354166666666668,
+          3.6354166666666665,
+          1.8339979924984444
+        ],
+        [
+          0.05598958333333348,
+          3.6484375,
+          1.7750827532039675
+        ],
+        [
+          0.0,
+          3.6666666666666665,
+          1.7319819083386023
+        ],
+        [
+          0.0,
+          3.6946614583333335,
+          1.7114902273108938
+        ],
+        [
+          0.0,
+          3.7343749999999996,
+          1.682420633294843
+        ],
+        [
+          0.0,
+          3.7819010416666665,
+          1.6476324306198962
+        ],
+        [
+          0.0,
+          3.8333333333333335,
+          1.6099849236155017
+        ],
+        [
+          0.0,
+          3.884765625,
+          1.5723374166111075
+        ],
+        [
+          0.0,
+          3.932291666666666,
+          1.5375492139361613
+        ],
+        [
+          0.0,
+          3.9720052083333335,
+          1.5084796199201094
+        ],
+        [
+          0.0,
+          4.0,
+          1.4879879388924013
+        ],
+        [
+          0.0302734375,
+          4,
+          1.4658283303391817
+        ],
+        [
+          0.07552083333333333,
+          4,
+          1.4327080551897462
+        ],
+        [
+          0.1298828125,
+          4,
+          1.3929160699382663
+        ],
+        [
+          0.1875,
+          4,
+          1.3507413310789131
+        ],
+        [
+          0.24251302083333326,
+          4,
+          1.3104727951058588
+        ],
+        [
+          0.2890625,
+          4,
+          1.2763994185132739
+        ],
+        [
+          0.3212890625,
+          4,
+          1.2528101577953306
+        ],
+        [
+          0.3333333333333333,
+          4.0,
+          1.2439939694462
+        ],
+        [
+          0.29166666666666663,
+          4.0,
+          1.2134947232654252
+        ],
+        [
+          0.25,
+          4.0,
+          1.18299547708465
+        ],
+        [
+          0.20833333333333331,
+          4.0,
+          1.152496230903875
+        ],
+        [
+          0.16666666666666666,
+          4.0,
+          1.1219969847231002
+        ],
+        [
+          0.125,
+          4.0,
+          1.091497738542325
+        ],
+        [
+          0.08333333333333331,
+          4.0,
+          1.06099849236155
+        ],
+        [
+          0.041666666666666685,
+          4.0,
+          1.030499246180775
+        ],
+        [
+          0.0,
+          4.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "id": "6:(4, 4, 2)->(4, 4, 4):stair",
+      "type": "stair",
+      "source": [
+        4,
+        4,
+        2
+      ],
+      "target": [
+        4,
+        4,
+        4
+      ],
+      "geometry": [
+        [
+          4.0,
+          4.0,
+          2.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0
+        ]
+      ]
+    },
+    {
+      "id": "7:(4, 3, 1)->(0, 0, 0):slide",
+      "type": "slide",
+      "source": [
+        4,
+        3,
+        1
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "geometry": [
+        [
+          4.0,
+          3.0,
+          1.0
+        ],
+        [
+          4.0,
+          2.9583333333333335,
+          0.9942418310623662
+        ],
+        [
+          4.0,
+          2.9166666666666665,
+          0.9884836621247323
+        ],
+        [
+          4.0,
+          2.875,
+          0.9827254931870985
+        ],
+        [
+          4.0,
+          2.833333333333333,
+          0.9769673242494645
+        ],
+        [
+          4.0,
+          2.7916666666666665,
+          0.9712091553118307
+        ],
+        [
+          4.0,
+          2.75,
+          0.9654509863741969
+        ],
+        [
+          4.0,
+          2.708333333333333,
+          0.9596928174365631
+        ],
+        [
+          4.0,
+          2.6666666666666665,
+          0.9539346484989292
+        ],
+        [
+          3.972005208333333,
+          2.6529947916666665,
+          0.9496291626159616
+        ],
+        [
+          3.932291666666667,
+          2.6510416666666665,
+          0.9441342746221475
+        ],
+        [
+          3.884765625,
+          2.6569010416666665,
+          0.9375166357932257
+        ],
+        [
+          3.833333333333333,
+          2.6666666666666665,
+          0.9302819066152112
+        ],
+        [
+          3.781901041666667,
+          2.6764322916666665,
+          0.9230471774371967
+        ],
+        [
+          3.734375,
+          2.6822916666666665,
+          0.916429538608275
+        ],
+        [
+          3.694661458333333,
+          2.6803385416666665,
+          0.9109346506144607
+        ],
+        [
+          3.6666666666666665,
+          2.6666666666666665,
+          0.9066291647314932
+        ],
+        [
+          3.6552734374999996,
+          2.6386718749999996,
+          0.9024522726426119
+        ],
+        [
+          3.6588541666666665,
+          2.5989583333333335,
+          0.8969417545501481
+        ],
+        [
+          3.6715494791666665,
+          2.5514322916666665,
+          0.8901435542134023
+        ],
+        [
+          3.6875,
+          2.4999999999999996,
+          0.8827018541992709
+        ],
+        [
+          3.700846354166667,
+          2.448567708333334,
+          0.8753587059692334
+        ],
+        [
+          3.7057291666666665,
+          2.401041666666667,
+          0.8687562218830049
+        ],
+        [
+          3.6962890625,
+          2.361328125000001,
+          0.8631150444509977
+        ],
+        [
+          3.6666666666666665,
+          2.3333333333333335,
+          0.8574824833454329
+        ],
+        [
+          3.6106770833333335,
+          2.3196614583333335,
+          0.8495176012408813
+        ],
+        [
+          3.5312499999999996,
+          2.3177083333333335,
+          0.8385377735882058
+        ],
+        [
+          3.4361979166666665,
+          2.3235677083333335,
+          0.8253770165469873
+        ],
+        [
+          3.3333333333333335,
+          2.3333333333333335,
+          0.8110976187753094
+        ],
+        [
+          3.23046875,
+          2.343098958333334,
+          0.7968182210036314
+        ],
+        [
+          3.1354166666666665,
+          2.348958333333333,
+          0.7836574639624129
+        ],
+        [
+          3.0559895833333335,
+          2.3470052083333335,
+          0.7726776363097375
+        ],
+        [
+          3.0,
+          2.3333333333333335,
+          0.7647127542051858
+        ],
+        [
+          2.9749348958333335,
+          2.3053385416666665,
+          0.7595198771369316
+        ],
+        [
+          2.9765624999999996,
+          2.2656250000000004,
+          0.7540270151120456
+        ],
+        [
+          2.9951171875,
+          2.2180989583333335,
+          0.746976305684522
+        ],
+        [
+          3.0208333333333335,
+          2.1666666666666665,
+          0.7390296110246182
+        ],
+        [
+          3.0439453125,
+          2.115234375,
+          0.7312372108339806
+        ],
+        [
+          3.0546875,
+          2.067708333333333,
+          0.7245036171489325
+        ],
+        [
+          3.0432942708333335,
+          2.027994791666666,
+          0.7187939771855782
+        ],
+        [
+          3.0,
+          2.0,
+          0.7116690326906645
+        ],
+        [
+          2.916015625,
+          1.986328125,
+          0.6999099407178816
+        ],
+        [
+          2.796875,
+          1.984375,
+          0.6834429641492376
+        ],
+        [
+          2.654296875,
+          1.990234375,
+          0.6637225982902784
+        ],
+        [
+          2.5,
+          1.9999999999999998,
+          0.6423567136890554
+        ],
+        [
+          2.345703125,
+          2.009765625,
+          0.6209908290878325
+        ],
+        [
+          2.203125,
+          2.015625,
+          0.6012704632288732
+        ],
+        [
+          2.083984375,
+          2.013671875,
+          0.5848034866602292
+        ],
+        [
+          2.0,
+          2.0,
+          0.5730443946874464
+        ],
+        [
+          1.9567057291666665,
+          1.9720052083333335,
+          0.5659194501925324
+        ],
+        [
+          1.9453125,
+          1.9322916666666665,
+          0.5602098102291784
+        ],
+        [
+          1.9560546875,
+          1.884765625,
+          0.5534762165441303
+        ],
+        [
+          1.9791666666666667,
+          1.8333333333333335,
+          0.5456838163534926
+        ],
+        [
+          2.0048828125,
+          1.7819010416666665,
+          0.5377371216935888
+        ],
+        [
+          2.0234375,
+          1.734375,
+          0.5306864122660653
+        ],
+        [
+          2.025065104166667,
+          1.6946614583333337,
+          0.5251935502411792
+        ],
+        [
+          2.0,
+          1.6666666666666667,
+          0.520000673172925
+        ],
+        [
+          1.9440104166666665,
+          1.6529947916666667,
+          0.5120357910683733
+        ],
+        [
+          1.8645833333333335,
+          1.6510416666666667,
+          0.5010559634156979
+        ],
+        [
+          1.76953125,
+          1.6569010416666667,
+          0.48789520637447925
+        ],
+        [
+          1.6666666666666665,
+          1.6666666666666667,
+          0.4736158086028014
+        ],
+        [
+          1.5638020833333333,
+          1.6764322916666667,
+          0.45933641083112353
+        ],
+        [
+          1.46875,
+          1.6822916666666667,
+          0.44617565378990487
+        ],
+        [
+          1.3893229166666665,
+          1.6803385416666667,
+          0.4351958261372295
+        ],
+        [
+          1.3333333333333333,
+          1.6666666666666667,
+          0.4272309440326779
+        ],
+        [
+          1.3037109374999998,
+          1.6386718750000002,
+          0.42159838292711316
+        ],
+        [
+          1.2942708333333333,
+          1.5989583333333333,
+          0.41595720549510584
+        ],
+        [
+          1.2991536458333333,
+          1.5514322916666667,
+          0.4093547214088774
+        ],
+        [
+          1.3125,
+          1.5000000000000002,
+          0.40201157317883973
+        ],
+        [
+          1.3284505208333335,
+          1.4485677083333333,
+          0.3945698731647084
+        ],
+        [
+          1.3411458333333335,
+          1.4010416666666667,
+          0.38777167282796277
+        ],
+        [
+          1.3447265625,
+          1.3613281249999996,
+          0.3822611547354987
+        ],
+        [
+          1.3333333333333333,
+          1.3333333333333333,
+          0.37808426264661754
+        ],
+        [
+          1.3053385416666667,
+          1.3196614583333333,
+          0.3737787767636501
+        ],
+        [
+          1.2656249999999998,
+          1.3177083333333333,
+          0.36828388876983575
+        ],
+        [
+          1.2180989583333333,
+          1.3235677083333333,
+          0.3616662499409141
+        ],
+        [
+          1.1666666666666667,
+          1.3333333333333333,
+          0.35443152076289963
+        ],
+        [
+          1.115234375,
+          1.343098958333333,
+          0.3471967915848849
+        ],
+        [
+          1.0677083333333335,
+          1.3489583333333335,
+          0.3405791527559633
+        ],
+        [
+          1.027994791666667,
+          1.3470052083333333,
+          0.33508426476214903
+        ],
+        [
+          1.0,
+          1.3333333333333333,
+          0.3307787788791816
+        ],
+        [
+          0.9908854166666666,
+          1.3053385416666667,
+          0.3267101218274877
+        ],
+        [
+          1.0,
+          1.2656249999999998,
+          0.3210791777509344
+        ],
+        [
+          1.01953125,
+          1.2180989583333333,
+          0.31397827452650406
+        ],
+        [
+          1.0416666666666667,
+          1.1666666666666667,
+          0.30624021194476414
+        ],
+        [
+          1.05859375,
+          1.115234375,
+          0.2987574260958833
+        ],
+        [
+          1.0625,
+          1.0677083333333335,
+          0.2921673672663243
+        ],
+        [
+          1.0455729166666667,
+          1.027994791666667,
+          0.28620137534108836
+        ],
+        [
+          1.0,
+          1.0,
+          0.2788100189635576
+        ],
+        [
+          0.916015625,
+          0.9908854166666666,
+          0.2671355594240229
+        ],
+        [
+          0.796875,
+          1.0,
+          0.25062268400994137
+        ],
+        [
+          0.654296875,
+          1.01953125,
+          0.2307349362102562
+        ],
+        [
+          0.5,
+          1.0416666666666667,
+          0.20919341047430884
+        ],
+        [
+          0.345703125,
+          1.05859375,
+          0.18774226126095028
+        ],
+        [
+          0.203125,
+          1.0625,
+          0.16803113340589837
+        ],
+        [
+          0.083984375,
+          1.0455729166666667,
+          0.15140102267566913
+        ],
+        [
+          0.0,
+          1.0,
+          0.13819605450321226
+        ],
+        [
+          0.0,
+          0.875,
+          0.12092154769031072
+        ],
+        [
+          0.0,
+          0.75,
+          0.10364704087740917
+        ],
+        [
+          0.0,
+          0.625,
+          0.08637253406450773
+        ],
+        [
+          0.0,
+          0.5,
+          0.06909802725160619
+        ],
+        [
+          0.0,
+          0.375,
+          0.05182352043870464
+        ],
+        [
+          0.0,
+          0.25,
+          0.03454901362580309
+        ],
+        [
+          0.0,
+          0.125,
+          0.017274506812901547
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ]
+    },
+    {
+      "id": "8:(1, 4, 0)->(2, 0, 1):stair",
+      "type": "stair",
+      "source": [
+        1,
+        4,
+        0
+      ],
+      "target": [
+        2,
+        0,
+        1
+      ],
+      "geometry": [
+        [
+          1.0,
+          4.0,
+          0.0
+        ],
+        [
+          2.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "id": "9:(3, 2, 3)->(2, 0, 2):slide",
+      "type": "slide",
+      "source": [
+        3,
+        2,
+        3
+      ],
+      "target": [
+        2,
+        0,
+        2
+      ],
+      "geometry": [
+        [
+          3.0,
+          2.0,
+          3.0
+        ],
+        [
+          3.0,
+          1.9583333333333333,
+          2.9865374055394485
+        ],
+        [
+          3.0,
+          1.9166666666666667,
+          2.9730748110788965
+        ],
+        [
+          3.0,
+          1.875,
+          2.959612216618345
+        ],
+        [
+          3.0,
+          1.8333333333333335,
+          2.9461496221577934
+        ],
+        [
+          3.0,
+          1.7916666666666667,
+          2.9326870276972414
+        ],
+        [
+          3.0,
+          1.75,
+          2.91922443323669
+        ],
+        [
+          3.0,
+          1.7083333333333335,
+          2.9057618387761384
+        ],
+        [
+          3.0,
+          1.6666666666666667,
+          2.892299244315587
+        ],
+        [
+          2.944010416666667,
+          1.6529947916666667,
+          2.8736773562013163
+        ],
+        [
+          2.864583333333333,
+          1.6510416666666667,
+          2.8480065277598947
+        ],
+        [
+          2.76953125,
+          1.6569010416666667,
+          2.8172366881183746
+        ],
+        [
+          2.666666666666667,
+          1.6666666666666667,
+          2.7838514673262944
+        ],
+        [
+          2.563802083333333,
+          1.6764322916666667,
+          2.750466246534214
+        ],
+        [
+          2.46875,
+          1.6822916666666667,
+          2.7196964068926937
+        ],
+        [
+          2.389322916666667,
+          1.6803385416666667,
+          2.6940255784512726
+        ],
+        [
+          2.3333333333333335,
+          1.6666666666666667,
+          2.675403690337002
+        ],
+        [
+          2.3037109375000004,
+          1.6386718750000002,
+          2.6622347668893247
+        ],
+        [
+          2.2942708333333335,
+          1.5989583333333333,
+          2.6490456984771815
+        ],
+        [
+          2.2991536458333335,
+          1.5514322916666667,
+          2.6336090958613396
+        ],
+        [
+          2.3125,
+          1.5000000000000002,
+          2.6164408210581103
+        ],
+        [
+          2.328450520833333,
+          1.4485677083333333,
+          2.5990421322609563
+        ],
+        [
+          2.3411458333333335,
+          1.4010416666666667,
+          2.583147945204888
+        ],
+        [
+          2.3447265625,
+          1.3613281249999996,
+          2.5702643582261326
+        ],
+        [
+          2.3333333333333335,
+          1.3333333333333333,
+          2.560498787797905
+        ],
+        [
+          2.3053385416666665,
+          1.3264973958333333,
+          2.55118784374077
+        ],
+        [
+          2.2656250000000004,
+          1.3411458333333333,
+          2.53751125600069
+        ],
+        [
+          2.2180989583333335,
+          1.3675130208333333,
+          2.5199505564941065
+        ],
+        [
+          2.1666666666666665,
+          1.3958333333333333,
+          2.5009799659478813
+        ],
+        [
+          2.115234375,
+          1.416341145833333,
+          2.4830897522832167
+        ],
+        [
+          2.067708333333333,
+          1.4192708333333335,
+          2.4677048324624566
+        ],
+        [
+          2.027994791666666,
+          1.3948567708333333,
+          2.4526425413712154
+        ],
+        [
+          2.0,
+          1.3333333333333333,
+          2.4308030227376536
+        ],
+        [
+          2.0,
+          1.1666666666666665,
+          2.376952644895447
+        ],
+        [
+          2.0,
+          1.0,
+          2.3231022670532404
+        ],
+        [
+          2.0,
+          0.8333333333333333,
+          2.2692518892110334
+        ],
+        [
+          2.0,
+          0.6666666666666666,
+          2.215401511368827
+        ],
+        [
+          2.0,
+          0.5,
+          2.16155113352662
+        ],
+        [
+          2.0,
+          0.33333333333333326,
+          2.107700755684413
+        ],
+        [
+          2.0,
+          0.16666666666666674,
+          2.0538503778422066
+        ],
+        [
+          2.0,
+          0.0,
+          2.0
+        ]
+      ]
+    },
+    {
+      "id": "10:(4, 0, 0)->(2, 1, 1):stair",
+      "type": "stair",
+      "source": [
+        4,
+        0,
+        0
+      ],
+      "target": [
+        2,
+        1,
+        1
+      ],
+      "geometry": [
+        [
+          4.0,
+          0.0,
+          0.0
+        ],
+        [
+          2.0,
+          1.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "id": "11:(2, 1, 2)->(1, 0, 1):slide",
+      "type": "slide",
+      "source": [
+        2,
+        1,
+        2
+      ],
+      "target": [
+        1,
+        0,
+        1
+      ],
+      "geometry": [
+        [
+          2.0,
+          1.0,
+          2.0
+        ],
+        [
+          2.0,
+          0.875,
+          1.9375
+        ],
+        [
+          2.0,
+          0.75,
+          1.875
+        ],
+        [
+          2.0,
+          0.625,
+          1.8125
+        ],
+        [
+          2.0,
+          0.5,
+          1.75
+        ],
+        [
+          2.0,
+          0.375,
+          1.6875
+        ],
+        [
+          2.0,
+          0.25,
+          1.625
+        ],
+        [
+          2.0,
+          0.125,
+          1.5625
+        ],
+        [
+          2.0,
+          0.0,
+          1.5
+        ],
+        [
+          1.875,
+          0.0,
+          1.4375
+        ],
+        [
+          1.75,
+          0.0,
+          1.375
+        ],
+        [
+          1.625,
+          0.0,
+          1.3125
+        ],
+        [
+          1.5,
+          0.0,
+          1.25
+        ],
+        [
+          1.375,
+          0.0,
+          1.1875
+        ],
+        [
+          1.25,
+          0.0,
+          1.125
+        ],
+        [
+          1.125,
+          0.0,
+          1.0625
+        ],
+        [
+          1.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "id": "12:(2, 2, 2)->(0, 2, 1):slide",
+      "type": "slide",
+      "source": [
+        2,
+        2,
+        2
+      ],
+      "target": [
+        0,
+        2,
+        1
+      ],
+      "geometry": [
+        [
+          2.0,
+          2.0,
+          2.0
+        ],
+        [
+          1.75,
+          2.0,
+          1.875
+        ],
+        [
+          1.5,
+          2.0,
+          1.75
+        ],
+        [
+          1.25,
+          2.0,
+          1.625
+        ],
+        [
+          1.0,
+          2.0,
+          1.5
+        ],
+        [
+          0.75,
+          2.0,
+          1.375
+        ],
+        [
+          0.5,
+          2.0,
+          1.25
+        ],
+        [
+          0.25,
+          2.0,
+          1.125
+        ],
+        [
+          0.0,
+          2.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "id": "13:(2, 2, 4)->(3, 3, 3):slide",
+      "type": "slide",
+      "source": [
+        2,
+        2,
+        4
+      ],
+      "target": [
+        3,
+        3,
+        3
+      ],
+      "geometry": [
+        [
+          2.0,
+          2.0,
+          4.0
+        ],
+        [
+          2.0,
+          2.0833333333333335,
+          3.9585058154382
+        ],
+        [
+          2.0,
+          2.1666666666666665,
+          3.9170116308764
+        ],
+        [
+          2.0,
+          2.25,
+          3.8755174463146
+        ],
+        [
+          2.0,
+          2.333333333333333,
+          3.8340232617528
+        ],
+        [
+          2.0,
+          2.4166666666666665,
+          3.7925290771910003
+        ],
+        [
+          2.0,
+          2.5,
+          3.7510348926292
+        ],
+        [
+          2.0,
+          2.583333333333333,
+          3.7095407080674003
+        ],
+        [
+          2.0,
+          2.6666666666666665,
+          3.6680465235056
+        ],
+        [
+          2.083984375,
+          2.6962890624999996,
+          3.6237031565802362
+        ],
+        [
+          2.203125,
+          2.7057291666666665,
+          3.564193508446948
+        ],
+        [
+          2.345703125,
+          2.7008463541666665,
+          3.493157932400636
+        ],
+        [
+          2.5,
+          2.6875,
+          3.4160419787371987
+        ],
+        [
+          2.654296875,
+          2.671549479166667,
+          3.338803476612221
+        ],
+        [
+          2.796875,
+          2.6588541666666665,
+          3.2675286445451337
+        ],
+        [
+          2.916015625,
+          2.6552734375,
+          3.2081781405889007
+        ],
+        [
+          3.0,
+          2.6666666666666665,
+          3.1659767382472
+        ],
+        [
+          3.0,
+          2.708333333333333,
+          3.1452296459663
+        ],
+        [
+          3.0,
+          2.75,
+          3.1244825536853997
+        ],
+        [
+          3.0,
+          2.7916666666666665,
+          3.1037354614045
+        ],
+        [
+          3.0,
+          2.833333333333333,
+          3.0829883691236
+        ],
+        [
+          3.0,
+          2.875,
+          3.0622412768427
+        ],
+        [
+          3.0,
+          2.9166666666666665,
+          3.0414941845617998
+        ],
+        [
+          3.0,
+          2.9583333333333335,
+          3.0207470922809
+        ],
+        [
+          3.0,
+          3.0,
+          3.0
+        ]
+      ]
+    },
+    {
+      "id": "14:(3, 1, 0)->(4, 2, 1):stair",
+      "type": "stair",
+      "source": [
+        3,
+        1,
+        0
+      ],
+      "target": [
+        4,
+        2,
+        1
+      ],
+      "geometry": [
+        [
+          3.0,
+          1.0,
+          0.0
+        ],
+        [
+          4.0,
+          2.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "id": "15:(3, 1, 3)->(3, 0, 4):stair",
+      "type": "stair",
+      "source": [
+        3,
+        1,
+        3
+      ],
+      "target": [
+        3,
+        0,
+        4
+      ],
+      "geometry": [
+        [
+          3.0,
+          1.0,
+          3.0
+        ],
+        [
+          3.0,
+          0.0,
+          4.0
+        ]
+      ]
+    },
+    {
+      "id": "16:(3, 4, 3)->(3, 3, 2):slide",
+      "type": "slide",
+      "source": [
+        3,
+        4,
+        3
+      ],
+      "target": [
+        3,
+        3,
+        2
+      ],
+      "geometry": [
+        [
+          3.0,
+          4.0,
+          3.0
+        ],
+        [
+          3.0,
+          3.875,
+          2.875
+        ],
+        [
+          3.0,
+          3.75,
+          2.75
+        ],
+        [
+          3.0,
+          3.625,
+          2.625
+        ],
+        [
+          3.0,
+          3.5,
+          2.5
+        ],
+        [
+          3.0,
+          3.375,
+          2.375
+        ],
+        [
+          3.0,
+          3.25,
+          2.25
+        ],
+        [
+          3.0,
+          3.125,
+          2.125
+        ],
+        [
+          3.0,
+          3.0,
+          2.0
+        ]
+      ]
+    },
+    {
+      "id": "17:(4, 0, 1)->(3, 0, 2):stair",
+      "type": "stair",
+      "source": [
+        4,
+        0,
+        1
+      ],
+      "target": [
+        3,
+        0,
+        2
+      ],
+      "geometry": [
+        [
+          4.0,
+          0.0,
+          1.0
+        ],
+        [
+          3.0,
+          0.0,
+          2.0
+        ]
+      ]
+    },
+    {
+      "id": "18:(3, 0, 1)->(3, 0, 0):slide",
+      "type": "slide",
+      "source": [
+        3,
+        0,
+        1
+      ],
+      "target": [
+        3,
+        0,
+        0
+      ],
+      "geometry": [
+        [
+          3.0,
+          0.0,
+          1.0
+        ],
+        [
+          3.0,
+          0.041666666666666664,
+          0.969499915454346
+        ],
+        [
+          3.0,
+          0.08333333333333333,
+          0.938999830908692
+        ],
+        [
+          3.0,
+          0.125,
+          0.9084997463630379
+        ],
+        [
+          3.0,
+          0.16666666666666666,
+          0.8779996618173839
+        ],
+        [
+          3.0,
+          0.20833333333333331,
+          0.8474995772717299
+        ],
+        [
+          3.0,
+          0.25,
+          0.8169994927260759
+        ],
+        [
+          3.0,
+          0.29166666666666663,
+          0.7864994081804219
+        ],
+        [
+          3.0,
+          0.3333333333333333,
+          0.7559993236347677
+        ],
+        [
+          2.972005208333333,
+          0.35156249999999994,
+          0.7315455155914421
+        ],
+        [
+          2.932291666666667,
+          0.3645833333333333,
+          0.7009524937697948
+        ],
+        [
+          2.884765625,
+          0.3723958333333333,
+          0.6656964324147545
+        ],
+        [
+          2.833333333333333,
+          0.375,
+          0.6279996618173838
+        ],
+        [
+          2.781901041666667,
+          0.37239583333333337,
+          0.5903028912200137
+        ],
+        [
+          2.734375,
+          0.36458333333333337,
+          0.5550468298649733
+        ],
+        [
+          2.694661458333333,
+          0.3515625,
+          0.5244538080433254
+        ],
+        [
+          2.6666666666666665,
+          0.3333333333333333,
+          0.5
+        ],
+        [
+          2.6484374999999996,
+          0.3053385416666667,
+          0.47554619195667436
+        ],
+        [
+          2.6354166666666665,
+          0.26562499999999994,
+          0.44495317013502667
+        ],
+        [
+          2.6276041666666665,
+          0.21809895833333331,
+          0.40969710877998666
+        ],
+        [
+          2.625,
+          0.16666666666666669,
+          0.37200033818261613
+        ],
+        [
+          2.627604166666667,
+          0.11523437500000003,
+          0.3343035675852456
+        ],
+        [
+          2.6354166666666665,
+          0.0677083333333334,
+          0.2990475062302056
+        ],
+        [
+          2.6484375,
+          0.02799479166666674,
+          0.2684544844085578
+        ],
+        [
+          2.6666666666666665,
+          0.0,
+          0.24400067636523237
+        ],
+        [
+          2.708333333333333,
+          0.0,
+          0.21350059181957837
+        ],
+        [
+          2.75,
+          0.0,
+          0.18300050727392414
+        ],
+        [
+          2.7916666666666665,
+          0.0,
+          0.15250042272827025
+        ],
+        [
+          2.833333333333333,
+          0.0,
+          0.12200033818261635
+        ],
+        [
+          2.875,
+          0.0,
+          0.09150025363696213
+        ],
+        [
+          2.9166666666666665,
+          0.0,
+          0.06100016909130812
+        ],
+        [
+          2.9583333333333335,
+          0.0,
+          0.030500084545653894
+        ],
+        [
+          3.0,
+          0.0,
+          0.0
+        ]
+      ]
+    },
+    {
+      "id": "19:(4, 1, 2)->(4, 1, 3):stair",
+      "type": "stair",
+      "source": [
+        4,
+        1,
+        2
+      ],
+      "target": [
+        4,
+        1,
+        3
+      ],
+      "geometry": [
+        [
+          4.0,
+          1.0,
+          2.0
+        ],
+        [
+          4.0,
+          1.0,
+          3.0
+        ]
+      ]
+    }
+  ],
+  "diagnostics": {
+    "warnings": [
+      "5:(0, 4, 3)->(0, 4, 1):slide: route has a turn sharper than 100.0 degrees",
+      "7:(4, 3, 1)->(0, 0, 0):slide / 8:(1, 4, 0)->(2, 0, 1):stair: minimum route clearance 0.116 is below 0.25",
+      "10:(4, 0, 0)->(2, 1, 1):stair / 18:(3, 0, 1)->(3, 0, 0):slide: minimum route clearance 0.202 is below 0.25"
+    ]
+  }
+}
