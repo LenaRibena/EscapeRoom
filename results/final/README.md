@@ -71,9 +71,6 @@ python -m examples.explain_hybrid_decisions results\hybrid_reproduced.json --eve
 Get-FileHash results\hybrid_building_reproduced.json -Algorithm SHA256
 ```
 
-Reproduce the DFS baseline separately with
-`python -m examples.export_building_json results\dfs_reproduced.json --seed 10 --grid-resolution 3`.
-Its expected SHA-256 is `67c4a5161ececea97e5b0214ab7df9a71ff07e640d4694390015561878b9f345`.
 The original untraced run used a 10-second per-solve limit; snapshot
 recording required a 60-second limit. Timing can affect retries. The
 `--reference-building` check prevents presenting a trace of different

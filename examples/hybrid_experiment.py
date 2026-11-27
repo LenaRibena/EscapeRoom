@@ -18,7 +18,7 @@ ROUTE = "0:(0, 4, 3)->(0, 0, 0):slide"
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--strategy", choices=("dfs_guided", "hybrid"), required=True)
+    parser.add_argument("--strategy", choices=("hybrid",), required=True)
     parser.add_argument("--weighting", choices=("uniform", "compact"), default="uniform")
     parser.add_argument("--compactness-strength", type=float, default=0.12)
     parser.add_argument("--isolated", action="store_true")
@@ -42,14 +42,8 @@ def main():
     args = parser.parse_args()
     if args.relative_budget and args.max_cells is not None:
         parser.error("--relative-budget and --max-cells are mutually exclusive")
-    if args.relative_budget and args.strategy != "hybrid":
-        parser.error("--relative-budget requires the hybrid strategy")
-    if args.strategy == "hybrid" and not (args.relative_budget or args.max_cells is not None):
+    if not (args.relative_budget or args.max_cells is not None):
         parser.error("hybrid requires --relative-budget or --max-cells")
-    if args.minimum_clearance is not None and (
-        args.strategy != "hybrid" or not (args.relative_budget or args.max_cells is not None)
-    ):
-        parser.error("--minimum-clearance requires a length-bounded hybrid strategy")
     if (not math.isfinite(args.detour_fraction) or args.detour_fraction < 0
             or args.detour_cap < 0):
         parser.error("Detour allowance must be finite and non-negative")

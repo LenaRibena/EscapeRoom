@@ -2,11 +2,21 @@
 
 Exam project for the course 02563 Generative Methods for Computer Graphics.
 
+## Setup
+
+The final result was reproduced with Python 3.13.11 and the following
+dependencies. From the repository root in PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install numpy==2.4.2 scipy==1.17.0 networkx==3.7 matplotlib==3.10.8 pillow==12.1.0
+```
+
 ## Graph-constrained WFC routing
 
-The preferred hybrid configuration and the preserved DFS-guided baseline route
-an inherited directed building graph on a refined 3D grid using a 22-tile
-vocabulary. The graph source is the
+The final hybrid configuration routes an inherited directed building graph on
+a refined 3D grid using a 22-tile vocabulary. The graph source is the
 exact upstream `src/graph.py` from commit `6daab25`. The upstream graph sets
 a four-floor, 10-by-10 footprint. The adapter rejects inconsistent dimensions.
 
@@ -27,12 +37,6 @@ The hybrid is explicitly configured by
 results, limitations and reproduction commands are in the
 [final hybrid results](results/final/README.md).
 
-In the baseline, DFS proposes a supported route, and the solver collapses compatible
-tiles and propagates constraints. The representative trace shows one candidate
-after DFS filtering at every route-guided collapse: DFS is therefore an
-important source of route choices, rather than evidence of independent random
-tile choices in that trace.
-
 ## Upstream human simulation
 
 `src/human.py` is unchanged from upstream. `Human` reads the building's graph,
@@ -51,22 +55,20 @@ is the stored accepted geometry; it is not reconstructed or smoothed again.
 See the [Inherited Graph vs Hybrid WFC figure](results/final/building/building_seed10_hybrid.png).
 See the final results README for the hybrid settings and reproduction commands.
 
-To reproduce the DFS-guided baseline from the repository root in PowerShell,
-use a fresh output path:
+To reproduce the final hybrid building from the repository root in PowerShell,
+use fresh output paths:
 
 ```powershell
 $env:PYTHONHASHSEED = "0"
-python -m examples.export_building_json results\dfs_reproduced.json --seed 10 --grid-resolution 3
-Get-FileHash results\dfs_reproduced.json -Algorithm SHA256
+$env:MPLBACKEND = "Agg"
+python -m examples.hybrid_experiment --strategy hybrid --weighting compact --relative-budget --minimum-clearance 0.25 --routing-seed 10 --max-seconds 60 --max-backtracks 8 --route-attempts 3 --geometry-preference 1.5 --geometry-backtracking --trace-states --trace-route-id '0:(0, 4, 3)->(0, 0, 0):slide' --output results\hybrid_reproduced.json --building-output results\hybrid_building_reproduced.json
+Get-FileHash results\hybrid_building_reproduced.json -Algorithm SHA256
 ```
 
-The baseline hash is
-`67c4a5161ececea97e5b0214ab7df9a71ff07e640d4694390015561878b9f345`.
-The old DFS-guided demonstration remains reproducible with
-`python -m examples.wfc_decision_demo --baseline results\dfs_reproduced.json --output results\dfs_decisions_reproduced`;
-it is not the final hybrid demonstration.
-
-The exporter refuses to overwrite an existing JSON file. See
+The expected building hash is
+`dac79b23be631eb5611cfdf295107f8c2658cd77a523c11166743b804948ff0c`.
+Timing may affect retries and the reproduced result; the saved JSON remains
+authoritative. The runner refuses to overwrite existing output files. See
 [BLENDER_INTEGRATION.md](BLENDER_INTEGRATION.md) for the handoff contract and
 clearance limitations.
 

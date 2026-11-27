@@ -2,6 +2,8 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -21,6 +23,23 @@ FINAL = ROOT / "results" / "final"
 
 
 class FinalResultsTests(unittest.TestCase):
+    def test_hybrid_runner_rejects_dfs_and_missing_budget(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = str(Path(directory) / "record.json")
+            for arguments, expected in (
+                (["--strategy", "dfs_guided", "--relative-budget"], "invalid choice"),
+                (["--strategy", "hybrid"], "requires --relative-budget or --max-cells"),
+            ):
+                with self.subTest(arguments=arguments):
+                    result = subprocess.run(
+                        [sys.executable, "-m", "examples.hybrid_experiment",
+                         *arguments, "--output", output],
+                        cwd=ROOT, capture_output=True, text=True,
+                    )
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn(expected, result.stderr)
+                    self.assertFalse(Path(output).exists())
+
     def test_manifest_hashes_and_building_routes(self):
         manifest = json.loads((FINAL / "manifest.json").read_text(encoding="utf-8"))
         for name, expected in manifest["sha256"].items():
