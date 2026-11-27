@@ -33,9 +33,12 @@ Centerline clearance does not prove Blender mesh clearance.
 
 The hybrid is explicitly configured by
 [`examples/hybrid_experiment.py`](examples/hybrid_experiment.py); the existing
-`WFCBuilding` default remains `dfs_guided`. The accepted seed-10 configuration,
+`WFCBuilding` defaults to relative-budget hybrid routing. The accepted seed-10 configuration,
 results, limitations and reproduction commands are in the
 [final hybrid results](results/final/README.md).
+The constructor accepts hybrid budget, geometry and timing options directly;
+an absolute budget requires `hybrid_relative_budget=False` and
+`hybrid_max_cells` to be set. Direct stairs do not use the slide solver.
 
 ## Upstream human simulation
 

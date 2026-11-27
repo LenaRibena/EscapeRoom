@@ -15,7 +15,6 @@ from matplotlib.figure import Figure
 
 from src.graph import Building
 from src.hybrid_wfc import HybridBudgetExhausted
-from src.wfc_solver import solve_wfc
 from src.wfc_tiles import (
     Cell,
     ContradictionError,
@@ -199,17 +198,24 @@ class WFCBuilding(Building):
         recovery_strategy: str = "recency",
         minimum_curvature_radius: float = 0.02,
         tile_aware_connectivity: bool = False,
-        endpoint_frontier: bool = True,
-        candidate_lookahead: bool = False,
-        routing_strategy: str = "dfs_guided",
+        routing_strategy: str = "hybrid",
         routing_seed: int | None = None,
         trace_callback: Callable[[Mapping[str, object]], None] | None = None,
         trace_route_id: str | None = None,
         trace_wfc: bool = False,
         trace_states: bool = False,
         only_route_id: str | None = None,
-        hybrid_weighting: str = "uniform",
+        hybrid_weighting: str = "compact",
         hybrid_compactness_strength: float = 0.12,
+        hybrid_max_cells: int | None = None,
+        hybrid_relative_budget: bool = True,
+        hybrid_detour_fraction: float = 0.25,
+        hybrid_detour_cap: int = 4,
+        hybrid_minimum_clearance: float | None = 0.25,
+        hybrid_max_backtracks: int = 8,
+        hybrid_max_seconds: float = 60.0,
+        hybrid_geometry_preference: float = 1.5,
+        hybrid_geometry_backtracking: bool = True,
     ) -> None:
         if not isinstance(grid_resolution, int) or grid_resolution < 1:
             raise ValueError("grid_resolution must be a positive integer")
@@ -240,19 +246,40 @@ class WFCBuilding(Building):
             isinstance(option, bool)
             for option in (
                 tile_aware_connectivity,
-                endpoint_frontier,
-                candidate_lookahead,
                 trace_wfc,
                 trace_states,
             )
         ):
             raise ValueError("WFC heuristic options must be booleans")
-        if routing_strategy not in ("dfs_guided", "hybrid"):
-            raise ValueError("routing_strategy must be 'dfs_guided' or 'hybrid'")
+        if routing_strategy != "hybrid":
+            raise ValueError("routing_strategy must be 'hybrid'")
         if hybrid_weighting not in ("uniform", "compact"):
             raise ValueError("hybrid_weighting must be 'uniform' or 'compact'")
         if not isfinite(hybrid_compactness_strength) or hybrid_compactness_strength < 0:
             raise ValueError("hybrid_compactness_strength must be finite and non-negative")
+        if not isinstance(hybrid_relative_budget, bool) or not isinstance(hybrid_geometry_backtracking, bool):
+            raise ValueError("hybrid budget and geometry options must be booleans")
+        if hybrid_max_cells is not None and (
+            not isinstance(hybrid_max_cells, int) or isinstance(hybrid_max_cells, bool)
+            or hybrid_max_cells < 2
+        ):
+            raise ValueError("hybrid_max_cells must be an integer of at least 2")
+        if hybrid_relative_budget == (hybrid_max_cells is not None):
+            raise ValueError("hybrid routing requires exactly one relative or absolute cell budget")
+        if not isfinite(hybrid_detour_fraction) or hybrid_detour_fraction < 0:
+            raise ValueError("hybrid_detour_fraction must be finite and non-negative")
+        if not isinstance(hybrid_detour_cap, int) or hybrid_detour_cap < 0:
+            raise ValueError("hybrid_detour_cap must be a non-negative integer")
+        if hybrid_minimum_clearance is not None and (
+            not isfinite(hybrid_minimum_clearance) or hybrid_minimum_clearance < 0
+        ):
+            raise ValueError("hybrid_minimum_clearance must be finite and non-negative")
+        if not isinstance(hybrid_max_backtracks, int) or hybrid_max_backtracks < 0:
+            raise ValueError("hybrid_max_backtracks must be a non-negative integer")
+        if not isfinite(hybrid_max_seconds) or hybrid_max_seconds <= 0:
+            raise ValueError("hybrid_max_seconds must be finite and positive")
+        if not isfinite(hybrid_geometry_preference) or hybrid_geometry_preference < 0:
+            raise ValueError("hybrid_geometry_preference must be finite and non-negative")
         if (
             not isfinite(minimum_slide_horizontal_travel)
             or minimum_slide_horizontal_travel <= 0
@@ -303,11 +330,18 @@ class WFCBuilding(Building):
         self.minimum_turning_radius = minimum_turning_radius
         self.minimum_curvature_radius = minimum_curvature_radius
         self.tile_aware_connectivity = tile_aware_connectivity
-        self.endpoint_frontier = endpoint_frontier
-        self.candidate_lookahead = candidate_lookahead
         self.routing_strategy = routing_strategy
         self.hybrid_weighting = hybrid_weighting
         self.hybrid_compactness_strength = hybrid_compactness_strength
+        self.hybrid_max_cells = hybrid_max_cells
+        self.hybrid_relative_budget = hybrid_relative_budget
+        self.hybrid_detour_fraction = hybrid_detour_fraction
+        self.hybrid_detour_cap = hybrid_detour_cap
+        self.hybrid_minimum_clearance = hybrid_minimum_clearance
+        self.hybrid_max_backtracks = hybrid_max_backtracks
+        self.hybrid_max_seconds = hybrid_max_seconds
+        self.hybrid_geometry_preference = hybrid_geometry_preference
+        self.hybrid_geometry_backtracking = hybrid_geometry_backtracking
         self.floor_grid = frozenset(self.graph.nodes)
         self.grid_shape = (
             (floors - 1) * self.vertical_grid_resolution + 1,
@@ -1154,6 +1188,8 @@ class WFCBuilding(Building):
         trace_states = getattr(self, "trace_states", False)
         routing_seed = getattr(self, "routing_seed", self.seed)
         kind = _EDGE_PORTS[edge_name]
+        if kind is not PortKind.SLIDE:
+            raise ValueError("Only slides are routed with hybrid WFC")
         start = self.graph_node_to_cell(source)
         end = self.graph_node_to_cell(target)
         if start in self.forbidden_cells or end in self.forbidden_cells:
@@ -1246,11 +1282,7 @@ class WFCBuilding(Building):
                 ),
                 heuristics={
                     "tile_aware_connectivity": self.tile_aware_connectivity,
-                    "endpoint_frontier": self.endpoint_frontier,
-                    "candidate_lookahead": self.candidate_lookahead,
-                    "routing_strategy": getattr(
-                        self, "routing_strategy", "dfs_guided"
-                    ),
+                    "routing_strategy": "hybrid",
                 },
             )
         if not allowed[start] or not allowed[end]:
@@ -1289,7 +1321,6 @@ class WFCBuilding(Building):
         queued_exclusions: set[Cell] = set()
         tried_exclusions: set[Cell] = set()
         duplicate_candidates = 0
-        all_candidate_paths: list[dict[str, object]] = []
         for attempt in range(self.max_route_attempts):
             last_feasibility_stage = "discrete_wfc"
             self.total_wfc_attempts += 1
@@ -1306,126 +1337,81 @@ class WFCBuilding(Building):
                 excluded_cell=excluded,
                 excluded_cell_count=len(tried_exclusions),
             )
-            candidate_paths: list[dict[str, object]] = []
-
             def solver_trace(event: Mapping[str, object]) -> None:
-                if event.get("event") == "route_candidate":
-                    candidate_path = {
-                        "attempt": event.get("attempt"),
-                        "route_attempt": attempt + 1,
-                        "candidate_path": event.get("candidate_path"),
-                    }
-                    candidate_paths.append(candidate_path)
-                    all_candidate_paths.append(candidate_path)
                 emit_trace(
                     "solver_trace",
                     route_attempt=attempt + 1,
                     solver_event=dict(event),
                 )
-            solve_route = solve_wfc
-            if (
-                kind is PortKind.SLIDE
-                and getattr(self, "routing_strategy", "dfs_guided") == "hybrid"
-                and getattr(self, "hybrid_max_cells", None) is None
-                and not getattr(self, "hybrid_relative_budget", False)
-            ):
-                raise ValueError("hybrid routing requires a relative or absolute cell budget")
-            if (
-                kind is PortKind.SLIDE
-                and getattr(self, "routing_strategy", "dfs_guided") == "hybrid"
-                and (getattr(self, "hybrid_max_cells", None) is not None
-                     or getattr(self, "hybrid_relative_budget", False))
-            ):
-                from src.hybrid_wfc import (
-                    HybridGeometryRejected, relative_cell_budget,
-                    route_length_lower_bound, solve_length_bounded_hybrid,
-                    validate_hybrid_clearance,
+            from src.hybrid_wfc import (
+                HybridGeometryRejected, relative_cell_budget,
+                route_length_lower_bound, solve_length_bounded_hybrid,
+                validate_hybrid_clearance,
+            )
+
+            def validate_hybrid_geometry(layout, path):
+                extracted = self._extract_route(layout, tile_set, start, end, kind, route_id)
+                if extracted != path:
+                    raise HybridGeometryRejected("Extracted route differs from hybrid prefix")
+                candidate = WFCPath(
+                    route_id, kind, source, target, path,
+                    attempts=attempt + 1,
+                    vertical_resolution=self.vertical_grid_resolution,
+                    recovery_count=recovery_count,
                 )
+                try:
+                    candidate = self._smooth_route_candidate(candidate)
+                    self._validate_existing_routes_with_candidate(candidate)
+                except RouteGenerationError as error:
+                    raise HybridGeometryRejected(str(error)) from error
+                if self.hybrid_minimum_clearance is not None:
+                    validate_hybrid_clearance(candidate, self.routes, self.hybrid_minimum_clearance)
 
-                def validate_hybrid_geometry(layout, path):
-                    extracted = self._extract_route(
-                        layout, tile_set, start, end, kind, route_id
-                    )
-                    if extracted != path:
-                        raise HybridGeometryRejected("Extracted route differs from hybrid prefix")
-                    candidate = WFCPath(
-                        route_id, kind, source, target, path,
-                        attempts=attempt + 1,
-                        vertical_resolution=self.vertical_grid_resolution,
-                        recovery_count=recovery_count,
-                    )
-                    try:
-                        candidate = self._smooth_route_candidate(candidate)
-                        self._validate_existing_routes_with_candidate(candidate)
-                    except RouteGenerationError as error:
-                        raise HybridGeometryRejected(str(error)) from error
-                    minimum_clearance = getattr(self, "hybrid_minimum_clearance", None)
-                    if minimum_clearance is not None:
-                        validate_hybrid_clearance(candidate, self.routes, minimum_clearance)
-
-                def solve_route(route_cells, route_tiles, **options):
-                    max_cells = getattr(self, "hybrid_max_cells", None)
-                    if getattr(self, "hybrid_relative_budget", False):
-                        lower_bound = route_length_lower_bound(
-                            route_cells, route_tiles, options["allowed_tiles"], start, end,
-                            options["required_horizontal_steps"],
-                        )
-                        max_cells = relative_cell_budget(
-                            lower_bound, self.hybrid_detour_fraction, self.hybrid_detour_cap
-                        )
-                        emit_trace(
-                            "hybrid_route_budget", route_attempt=attempt + 1,
-                            lower_bound_cells=lower_bound, max_cells=max_cells,
-                        )
-                    return solve_length_bounded_hybrid(
-                        route_cells, route_tiles, start=start, end=end,
-                        allowed_tiles=options["allowed_tiles"], seed=options["seed"],
-                        max_cells=max_cells,
-                        required_horizontal_steps=options["required_horizontal_steps"],
-                        empty_index=tile_set.empty_index,
-                        tile_aware_connectivity=options["tile_aware_connectivity"],
-                        weighting=self.hybrid_weighting,
-                        compactness_strength=self.hybrid_compactness_strength,
-                        max_backtracks=self.hybrid_max_backtracks,
-                        max_seconds=self.hybrid_max_seconds,
-                        trace_callback=options["trace_callback"],
-                        trace_states=options["trace_states"],
-                        geometry_preference=getattr(self, "hybrid_geometry_preference", 0.0),
-                        validate_complete=(
-                            validate_hybrid_geometry
-                            if (getattr(self, "hybrid_geometry_backtracking", False)
-                                or getattr(self, "hybrid_minimum_clearance", None) is not None)
-                            else None
-                        ),
-                    )
             try:
-                layout = solve_route(
-                    cells,
-                    tile_set.tiles,
-                    seed=routing_seed + seed_offset + attempt,
-                    max_attempts=1,
-                    required_pairs=[(start, end)],
-                    required_typed_pairs=[(start, end, kind)],
-                    required_horizontal_steps=(
-                        self._required_slide_horizontal_steps(start, end)
-                        if kind is PortKind.SLIDE
-                        else 0
-                    ),
-                    preferred_tile_index=tile_set.empty_index,
+                horizontal_steps = self._required_slide_horizontal_steps(start, end)
+                max_cells = self.hybrid_max_cells
+                if self.hybrid_relative_budget:
+                    lower_bound = route_length_lower_bound(
+                        cells, tile_set.tiles, attempt_allowed, start, end, horizontal_steps,
+                    )
+                    max_cells = relative_cell_budget(
+                        lower_bound, self.hybrid_detour_fraction, self.hybrid_detour_cap
+                    )
+                    emit_trace(
+                        "hybrid_route_budget", route_attempt=attempt + 1,
+                        lower_bound_cells=lower_bound, max_cells=max_cells,
+                    )
+                if max_cells is None:
+                    raise ValueError("hybrid routing requires a cell budget")
+                layout = solve_length_bounded_hybrid(
+                    cells, tile_set.tiles, start=start, end=end,
+                    allowed_tiles=attempt_allowed, seed=routing_seed + seed_offset + attempt,
+                    max_cells=max_cells, required_horizontal_steps=horizontal_steps,
+                    empty_index=tile_set.empty_index,
                     tile_aware_connectivity=self.tile_aware_connectivity,
-                    endpoint_frontier=self.endpoint_frontier,
-                    candidate_lookahead=self.candidate_lookahead,
-                    require_closed_boundaries=True,
-                    allowed_tiles=attempt_allowed,
-                    trace_callback=(
-                        solver_trace
-                        if trace_enabled and trace_wfc
-                        else None
-                    ),
+                    weighting=self.hybrid_weighting,
+                    compactness_strength=self.hybrid_compactness_strength,
+                    max_backtracks=self.hybrid_max_backtracks,
+                    max_seconds=self.hybrid_max_seconds,
+                    trace_callback=solver_trace if trace_enabled and trace_wfc else None,
                     trace_states=trace_states,
+                    geometry_preference=self.hybrid_geometry_preference,
+                    validate_complete=(
+                        validate_hybrid_geometry
+                        if self.hybrid_geometry_backtracking
+                        or self.hybrid_minimum_clearance is not None else None
+                    ),
                 )
             except HybridBudgetExhausted as error:
                 last_error = str(error)
+                solver_attempt_failures.append({
+                    "attempt": attempt + 1,
+                    "phase": "hybrid_budget_exhausted",
+                    "cell": None,
+                    "domain": (),
+                    "domain_tile_names": (),
+                    "message": last_error,
+                })
                 emit_trace(
                     "route_attempt_failure", route_attempt=attempt + 1,
                     failure_phase="hybrid_budget_exhausted", failure_message=last_error,
@@ -1433,36 +1419,27 @@ class WFCBuilding(Building):
                 continue
             except ContradictionError as error:
                 last_error = str(error)
-                failure = getattr(error, "failure", None)
-                if failure is not None:
-                    solver_attempt_failures.append(
-                        {
-                            "attempt": attempt + 1,
-                            "phase": failure.phase,
-                            "cell": failure.cell,
-                            "domain": failure.domain,
-                            "domain_tile_names": tuple(
-                                tile_set.tiles[tile_index].name
-                                for tile_index in failure.domain
-                                if 0 <= tile_index < len(tile_set.tiles)
-                            ),
-                            "message": failure.message,
-                        }
-                    )
-                    for phase, count in error.phase_counts.items():
-                        solver_stage_counts[phase] = (
-                            solver_stage_counts.get(phase, 0) + count
-                        )
-                    emit_trace(
-                        "route_attempt_failure",
-                        route_attempt=attempt + 1,
-                        solver_attempt=failure.attempt,
-                        failure_phase=failure.phase,
-                        failure_message=failure.message,
-                        phase_counts=dict(error.phase_counts),
-                        route_retries_used=attempt,
-                        dfs_candidate_paths=tuple(candidate_paths),
-                    )
+                solver_attempt_failures.append({
+                    "attempt": attempt + 1,
+                    "phase": "hybrid_contradiction",
+                    "cell": error.cell,
+                    "domain": error.domain,
+                    "domain_tile_names": tuple(
+                        tile_set.tiles[index].name for index in error.domain
+                        if 0 <= index < len(tile_set.tiles)
+                    ),
+                    "message": last_error,
+                })
+                solver_stage_counts["hybrid_contradiction"] = (
+                    solver_stage_counts.get("hybrid_contradiction", 0) + 1
+                )
+                emit_trace(
+                    "route_attempt_failure",
+                    route_attempt=attempt + 1,
+                    failure_phase="hybrid_contradiction",
+                    failure_message=last_error,
+                    route_retries_used=attempt,
+                )
                 continue
 
             path = self._extract_route(
@@ -1474,34 +1451,11 @@ class WFCBuilding(Building):
                 route_id,
             )
             if path is not None:
-                path_set = set(path)
-                path_comparisons = tuple(
-                    {
-                        "candidate_index": index,
-                        "attempt": candidate_path["attempt"],
-                        "path": candidate_path["candidate_path"],
-                        "path_length": len(candidate_path["candidate_path"]),
-                        "exact_match": tuple(candidate_path["candidate_path"]) == path,
-                        "jaccard_similarity": (
-                            len(set(candidate_path["candidate_path"]) & path_set)
-                            / len(set(candidate_path["candidate_path"]) | path_set)
-                            if set(candidate_path["candidate_path"]) | path_set
-                            else 1.0
-                        ),
-                    }
-                    for index, candidate_path in enumerate(all_candidate_paths)
-                )
                 emit_trace(
                     "route_extracted",
                     route_attempt=attempt + 1,
-                    first_dfs_candidate_path=(
-                        all_candidate_paths[0]["candidate_path"]
-                        if all_candidate_paths else None
-                    ),
-                    subsequent_dfs_candidate_paths=tuple(all_candidate_paths[1:]),
                     final_discrete_route=path,
                     final_discrete_route_length=len(path),
-                    path_comparisons=path_comparisons,
                 )
                 discrete_route_candidates += 1
                 last_feasibility_stage = "smoothed_geometry"
@@ -1564,8 +1518,6 @@ class WFCBuilding(Building):
                     route_attempt=attempt + 1,
                     route_retries_used=attempt,
                     solver_failures=len(solver_attempt_failures),
-                    candidate_path_count=len(candidate_paths),
-                    total_dfs_candidate_paths=len(all_candidate_paths),
                 )
                 return replace(
                     candidate,
@@ -1577,8 +1529,6 @@ class WFCBuilding(Building):
                 "route_attempt_no_route",
                 route_attempt=attempt + 1,
                 route_retries_used=attempt,
-                candidate_path_count=len(candidate_paths),
-                total_dfs_candidate_paths=len(all_candidate_paths),
                 message=last_error,
             )
 
@@ -1646,11 +1596,7 @@ class WFCBuilding(Building):
                 "last_geometry_failure_details": last_geometry_failure_details,
                 "heuristics": {
                     "tile_aware_connectivity": self.tile_aware_connectivity,
-                    "endpoint_frontier": self.endpoint_frontier,
-                    "candidate_lookahead": self.candidate_lookahead,
-                    "routing_strategy": getattr(
-                        self, "routing_strategy", "dfs_guided"
-                    ),
+                    "routing_strategy": "hybrid",
                 },
             },
         )

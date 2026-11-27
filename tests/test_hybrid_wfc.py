@@ -25,9 +25,21 @@ class HybridTests(unittest.TestCase):
         self.allowed[self.end] = {self.tiles.connector_indices[Direction.W]}
 
     def test_unbounded_hybrid_is_rejected(self):
-        with self.assertRaisesRegex(ValueError, "requires a relative or absolute cell budget"):
+        with self.assertRaisesRegex(ValueError, "requires exactly one relative or absolute cell budget"):
             WFCBuilding(4, 10, 10, difficulty=2, seed=10, grid_resolution=3,
-                        routing_strategy="hybrid")
+                        routing_strategy="hybrid", hybrid_relative_budget=False)
+
+    def test_building_defaults_to_final_hybrid_settings(self):
+        building = WFCBuilding(4, 10, 10, difficulty=2, seed=10, grid_resolution=3,
+                               generate_routes=False)
+        self.assertEqual(building.routing_strategy, "hybrid")
+        self.assertTrue(building.hybrid_relative_budget)
+        self.assertEqual(building.hybrid_weighting, "compact")
+        self.assertEqual(building.hybrid_minimum_clearance, 0.25)
+        self.assertEqual(building.hybrid_geometry_preference, 1.5)
+        self.assertTrue(building.hybrid_geometry_backtracking)
+        with self.assertRaisesRegex(ValueError, "routing_strategy must be 'hybrid'"):
+            WFCBuilding(4, 10, 10, routing_strategy="dfs_guided")
 
     def test_length_lower_bound_counts_prefix_and_horizontal_requirement(self):
         prefix = [(2, 0, 0), (1, 0, 0)]

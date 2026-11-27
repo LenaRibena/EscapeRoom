@@ -16,7 +16,7 @@ from src.wfc_building import (
     build_route_tiles,
 )
 from src.route_diagnostics import diagnose_routes
-from src.wfc_tiles import Direction, PortKind
+from src.wfc_tiles import ContradictionError, Direction, PortKind
 
 
 def small_building(
@@ -50,8 +50,17 @@ def small_building(
     building.minimum_turning_radius = 0.02
     building.minimum_curvature_radius = minimum_curvature_radius
     building.tile_aware_connectivity = False
-    building.endpoint_frontier = False
-    building.candidate_lookahead = False
+    building.hybrid_weighting = "uniform"
+    building.hybrid_compactness_strength = 0.12
+    building.hybrid_max_cells = None
+    building.hybrid_relative_budget = True
+    building.hybrid_detour_fraction = 0.25
+    building.hybrid_detour_cap = 4
+    building.hybrid_minimum_clearance = None
+    building.hybrid_max_backtracks = 20
+    building.hybrid_max_seconds = 30.0
+    building.hybrid_geometry_preference = 0.0
+    building.hybrid_geometry_backtracking = False
     building.recovery_strategy = recovery_strategy
     building.forbidden_cells = set()
     building.occupancy = {}
@@ -150,7 +159,12 @@ class WFCBuildingTests(unittest.TestCase):
 
     def test_duplicate_rejected_paths_skip_repeated_geometry_validation(self):
         building = small_building(resolution=2)
-        with patch.object(
+        building.hybrid_relative_budget = False
+        building.hybrid_max_cells = 20
+        path = ((2, 2, 2), (1, 2, 2), (0, 2, 2))
+        with patch("src.hybrid_wfc.solve_length_bounded_hybrid", return_value={}), patch.object(
+            building, "_extract_route", return_value=path,
+        ), patch.object(
             building, "_smooth_route_candidate",
             side_effect=RouteGenerationError("rejected geometry"),
         ) as smooth:
@@ -219,7 +233,7 @@ class WFCBuildingTests(unittest.TestCase):
     def test_direct_diagonal_stair_does_not_invoke_wfc(self):
         source, target = (0, 0, 0), (2, 2, 1)
         building = small_building(source, target, "stair", resolution=2, vertical_resolution=2)
-        with patch("src.wfc_building.solve_wfc", side_effect=AssertionError("stair used WFC")):
+        with patch.object(building, "_generate_route", side_effect=AssertionError("stair used WFC")):
             routes = building.generate_routes()
         self.assertEqual(len(routes), 1)
         self.assertTrue(routes[0].direct_stair)
@@ -300,7 +314,7 @@ class WFCBuildingTests(unittest.TestCase):
                 building = WFCBuilding(
                     floors=4, width=10, length=10, difficulty=2,
                     grid_resolution=resolution, seed=10,
-                    endpoint_frontier=True, recovery_strategy="none",
+                    recovery_strategy="none",
                     minimum_curvature_radius=0.02, max_route_attempts=30,
                 )
                 stairs = [
@@ -407,7 +421,6 @@ class WFCBuildingTests(unittest.TestCase):
             difficulty=2,
             grid_resolution=3,
             seed=10,
-            endpoint_frontier=True,
             recovery_strategy="none",
             minimum_curvature_radius=0.02,
             max_route_attempts=30,
@@ -432,10 +445,7 @@ class WFCBuildingTests(unittest.TestCase):
 
         diagnostics = diagnose_routes(building, routes)
         self.assertEqual(diagnostics.logical_errors, ())
-        self.assertEqual(
-            diagnostics.warnings,
-            ("17:(0, 9, 2)->(0, 9, 1):slide: route has a turn sharper than 100.0 degrees",),
-        )
+        self.assertEqual(diagnostics.warnings, ())
 
     def test_routes_at_one_graph_node_can_share_a_typed_landing(self):
         building = small_building(vertical_resolution=3)
@@ -613,7 +623,6 @@ class WFCBuildingTests(unittest.TestCase):
                     max_route_attempts=30,
                     recovery_strategy="none",
                     minimum_curvature_radius=0.02,
-                    endpoint_frontier=True,
                     generate_routes=False,
                 )
                 try:
@@ -1039,19 +1048,10 @@ class WFCBuildingTests(unittest.TestCase):
         target = (1, 1, 1)
         building = small_building(source, target, "stair")
 
-        route = building._generate_route(
-            "stair-0",
-            source,
-            target,
-            "stair",
-        )
+        route = building._direct_stair("stair-0", source, target)
 
-        self.assertEqual(route.cells[0], (0, 1, 1))
-        self.assertEqual(route.cells[-1], (1, 1, 1))
-        self.assertTrue(all(
-            route.cells[index + 1][0] >= route.cells[index][0]
-            for index in range(len(route.cells) - 1)
-        ))
+        self.assertTrue(route.direct_stair)
+        self.assertEqual(route.accepted_geometry, ((1.0, 1.0, 0.0), (1.0, 1.0, 1.0)))
 
     def test_forbidden_cells_are_not_used_by_route(self):
         building = small_building()
@@ -1405,11 +1405,28 @@ class WFCBuildingTests(unittest.TestCase):
         self.assertEqual(details["route_id"], "slide-0")
         self.assertEqual(details["route_type"], "slide")
         self.assertEqual(details["grid_dimensions"], building.grid_shape)
-        self.assertEqual(details["feasibility_stage"], "smoothed_geometry")
+        self.assertEqual(details["feasibility_stage"], "discrete_wfc")
         self.assertGreater(details["available_cell_count"], 0)
         endpoint_constraints = details["endpoint_constraints"]
         self.assertIn("start_connectors", endpoint_constraints)
         self.assertIn("end_connectors", endpoint_constraints)
+
+    def test_hybrid_contradictions_are_reported_for_every_attempt(self):
+        building = small_building(resolution=2)
+        building.hybrid_relative_budget = False
+        building.hybrid_max_cells = 20
+        building.max_route_attempts = 2
+        events = []
+        building.trace_callback = events.append
+        with patch("src.hybrid_wfc.solve_length_bounded_hybrid",
+                   side_effect=ContradictionError("no tile", cell=(1, 2, 2), domain=(0,))):
+            with self.assertRaises(RouteGenerationError) as caught:
+                building._generate_route("slide-0", (1, 1, 1), (1, 1, 0), "slide")
+        failures = caught.exception.failure_details["solver_attempt_failures"]
+        self.assertEqual(len(failures), 2)
+        self.assertTrue(all(failure["phase"] == "hybrid_contradiction" for failure in failures))
+        self.assertEqual(failures[0]["cell"], (1, 2, 2))
+        self.assertEqual(sum(event["event"] == "route_attempt_failure" for event in events), 2)
 
     def test_slide_exceeding_maximum_grade_is_rejected(self):
         building = small_building(

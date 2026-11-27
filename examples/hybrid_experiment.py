@@ -92,23 +92,23 @@ def main():
             grid_resolution=args.grid_resolution,
             max_route_attempts=args.route_attempts, max_route_backtrack_depth=2,
             max_route_recovery_attempts=1, recovery_strategy="none",
-            minimum_curvature_radius=.02, endpoint_frontier=True,
+            minimum_curvature_radius=.02,
             routing_strategy=args.strategy, hybrid_weighting=args.weighting,
             hybrid_compactness_strength=args.compactness_strength,
             only_route_id=ROUTE if args.isolated else None,
             trace_callback=trace, trace_route_id=args.trace_route_id,
             trace_wfc=True, trace_states=args.trace_states,
             generate_routes=False,
+            hybrid_max_cells=args.max_cells,
+            hybrid_relative_budget=args.relative_budget,
+            hybrid_detour_fraction=args.detour_fraction,
+            hybrid_detour_cap=args.detour_cap,
+            hybrid_minimum_clearance=args.minimum_clearance,
+            hybrid_max_backtracks=args.max_backtracks,
+            hybrid_max_seconds=args.max_seconds,
+            hybrid_geometry_preference=args.geometry_preference,
+            hybrid_geometry_backtracking=args.geometry_backtracking,
         )
-        building.hybrid_max_cells = args.max_cells
-        building.hybrid_relative_budget = args.relative_budget
-        building.hybrid_detour_fraction = args.detour_fraction
-        building.hybrid_detour_cap = args.detour_cap
-        building.hybrid_minimum_clearance = args.minimum_clearance
-        building.hybrid_max_backtracks = args.max_backtracks
-        building.hybrid_max_seconds = args.max_seconds
-        building.hybrid_geometry_preference = args.geometry_preference
-        building.hybrid_geometry_backtracking = args.geometry_backtracking
         frozen_graph = {
             "nodes": [{"position": node, "attributes": dict(attributes)}
                       for node, attributes in building.graph.nodes(data=True)],
@@ -189,8 +189,7 @@ def main():
         "failures": counts["route_attempt_failure"],
         "geometry_rejections": counts["route_attempt_geometry_rejection"],
         "solver_contradictions": sum(event["event"] == "solver_contradiction" for event in details),
-        "explicit_collapses": sum(event["event"] in ("collapse_selected", "hybrid_length_choice")
-                                  for event in details),
+        "explicit_collapses": len(bounded_selections),
         "hybrid_selections": len(bounded_selections),
         "non_forced_collapses": sum(len(event["eligible"]) > 1
                                      for event in bounded_selections),
