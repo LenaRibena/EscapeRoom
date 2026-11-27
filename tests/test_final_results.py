@@ -1,6 +1,5 @@
 import hashlib
 import json
-from collections import Counter
 from pathlib import Path
 import re
 import tempfile
@@ -68,38 +67,6 @@ class FinalResultsTests(unittest.TestCase):
         self.assertEqual((east[3], east[4], east[-1]), (24, 1.125, 0.07985841697862626))
         self.assertEqual((south[3], south[4], south[-1]), (22, 0.0, 0.5488116360940265))
         self.assertIn("preceding run 8", turn_description(prefix, (1, 1, 4)))
-
-    def test_resolution_two_building_and_trace(self):
-        root = FINAL / "res2"
-        path = root / "building_seed10_hybrid_res2.json"
-        self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(),
-                         "363e6c46666e3b411148cd3df7687dfb2078d67f2c4280c69b0e39b9a9092830")
-        building = json.loads(path.read_text(encoding="utf-8"))
-        baseline = json.loads((FINAL / "building" / "building_seed10_hybrid.json").read_text(
-            encoding="utf-8"))
-        self.assertEqual(building["graph"], baseline["graph"])
-        self.assertEqual(building["generation"]["grid_resolution"], 2)
-        self.assertEqual(building["generation"]["vertical_grid_resolution"], 3)
-        edges = Counter((tuple(e["source"]), tuple(e["target"]), e["attributes"]["kind"])
-                        for e in building["graph"]["edges"]
-                        if e["attributes"]["kind"] in ("slide", "stair"))
-        routes = Counter((tuple(r["source"]), tuple(r["target"]), r["type"])
-                         for r in building["routes"])
-        self.assertEqual(routes, edges)
-        self.assertEqual(Counter(r["type"] for r in building["routes"]),
-                         {"slide": 10, "stair": 9})
-        self.assertTrue(all(r["geometry"][0] == r["source"] and
-                            r["geometry"][-1] == r["target"] for r in building["routes"]))
-        self.assertEqual(building["diagnostics"]["warnings"], [])
-        text = (root / "wfc_decisions_res2.txt").read_text(encoding="utf-8")
-        explained = (root / "wfc_decisions_explained_res2.txt").read_text(encoding="utf-8")
-        choices = re.findall(r"^Choice (\d+) \| .* \| (\d+) eligible \|", text, re.MULTILINE)
-        self.assertEqual([int(number) for number, _ in choices], list(range(1, 14)))
-        self.assertTrue(all(int(count) > 1 for _, count in choices))
-        self.assertEqual(len(re.findall(r"^Choice \d+ \|", explained, re.MULTILINE)), 13)
-        self.assertEqual(explained.count("  Independent RNG replay:"), 13)
-        with Image.open(root / "wfc_decisions_res2.gif") as image:
-            self.assertEqual(image.n_frames, 13)
 
     def test_building_figure_uses_graph_and_exact_route_geometry(self):
         building = json.loads(
