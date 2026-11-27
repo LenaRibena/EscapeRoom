@@ -39,9 +39,9 @@
   "sha256": {
     "building/building_seed10_hybrid.json": "dac79b23be631eb5611cfdf295107f8c2658cd77a523c11166743b804948ff0c",
     "building/building_seed10_hybrid.png": "8812bac3749b41803c3f7045329bae5df2a2a93b38541c4110705459933c6005",
-    "algorithm/wfc_decisions.gif": "92c3d2b3571c74875f9fbebeb03cfc51bf6c3f0a2fe9bb12d72d8758fa14b58b",
     "algorithm/wfc_decisions.txt": "c39343e816d571daa91b4c23319692fb30261d5be2eee5a47cfeb0e40477e0d7",
-    "algorithm/wfc_decisions_explained.txt": "4fbc1ab19dce94ffc8b40e591b69f2ff5a76becf484a28877d5e9e4585004aa0"
+    "algorithm/wfc_decisions_explained.txt": "bde12f84826e354e42233af56cd29365c9c087184ddb685a712a879e0ace1dbe",
+    "baseline/building_seed10_res3.json": "1a8a5409c36fa6950c978d52b84b71ede618e200bc4134c502d4de8bb1751756"
   },
   "provenance": {
     "original_traced_record_sha256": "016cddde3c17a0fef98772dbbe0f4ea8cfe95805ba7ee8b9970349cb16478ef9",

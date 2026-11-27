@@ -60,14 +60,12 @@ def turn_description(prefix, successor):
             f"preceding run {run}, cost {'3' if reversal else '1'} + 1/{run}")
 
 
-def explain(record, reference, original_text, replay_text, original_gif, replay_gif,
-            route_seed, expected_hash=ACCEPTED_HASH, new_execution=False):
+def explain(record, reference, original_text, replay_text, route_seed,
+            expected_hash=ACCEPTED_HASH, new_execution=False):
     if digest(reference) != expected_hash:
         raise ValueError("Reference JSON is not the accepted building")
     if original_text.read_bytes() != replay_text.read_bytes():
         raise ValueError("Replayed text differs from the accepted demonstration")
-    if digest(original_gif) != digest(replay_gif):
-        raise ValueError("Replayed GIF differs from the accepted demonstration")
     building = json.loads(reference.read_text(encoding="utf-8"))
     if not record["success"] or record["building"] != building:
         raise ValueError("Replay did not reproduce the accepted building")
@@ -115,10 +113,10 @@ def explain(record, reference, original_text, replay_text, original_gif, replay_
         "ACCEPTED SLIDE 0: EXPLAINED HYBRID WFC DECISIONS",
         "Route (0,4,3) -> (0,0,0); cells use (vertical layer, x, y).",
         "Directions N/E/S/W are +y/+x/-y/-x; U/D are +layer/-layer.",
-        f"The {len(choices)} numbered choices and captions correspond to the GIF frames.",
-        ("The building, GIF and TXT were produced from this same recorded execution."
+        f"The {len(choices)} numbered choices correspond to the recorded execution.",
+        ("The building and TXT were produced from this same recorded execution."
          if new_execution else
-         "The replay reproduced the accepted building and the GIF and original TXT byte-for-byte."),
+         "The replay reproduced the accepted building and original TXT byte-for-byte."),
         "",
         "HARD CONSTRAINTS, PROPAGATION AND SOFT WEIGHTS",
         "Local compatibility requires adjacent faces to have matching port kinds, including",
@@ -291,24 +289,21 @@ def main():
     reference = args.new_building if new_execution else args.final / "building" / "building_seed10_hybrid.json"
     original_text = (args.replay_visualization / "decisions.txt" if new_execution
                      else args.final / "algorithm" / "wfc_decisions.txt")
-    original_gif = (args.replay_visualization / "decisions.gif" if new_execution
-                    else args.final / "algorithm" / "wfc_decisions.gif")
     if new_execution:
         with tempfile.TemporaryDirectory() as directory:
             rendered = Path(directory) / "decisions"
             subprocess.run(
-                [sys.executable, "-m", "examples.hybrid_length_visualize", str(args.record),
+                [sys.executable, "-m", "examples.hybrid_length_trace", str(args.record),
                  "--reference-building", str(reference), "--route-id", ROUTE_ID,
                  "--output", str(rendered)],
                 check=True,
             )
             text = explain(record, reference, original_text, rendered / "decisions.txt",
-                           original_gif, rendered / "decisions.gif", starts[0]["routing_seed"],
-                           args.building_sha256, new_execution=True)
+                           starts[0]["routing_seed"], args.building_sha256,
+                           new_execution=True)
     else:
         text = explain(record, reference, original_text,
                        args.replay_visualization / "decisions.txt",
-                       original_gif, args.replay_visualization / "decisions.gif",
                        starts[0]["routing_seed"])
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("x", encoding="utf-8", newline="\n") as output:

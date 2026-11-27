@@ -1,8 +1,8 @@
 ACCEPTED SLIDE 0: EXPLAINED HYBRID WFC DECISIONS
 Route (0,4,3) -> (0,0,0); cells use (vertical layer, x, y).
 Directions N/E/S/W are +y/+x/-y/-x; U/D are +layer/-layer.
-The 21 numbered choices and captions correspond to the existing GIF frames.
-The replay reproduced the accepted building and the GIF and original TXT byte-for-byte.
+The 21 numbered choices correspond to the recorded execution.
+The replay reproduced the accepted building and original TXT byte-for-byte.
 
 HARD CONSTRAINTS, PROPAGATION AND SOFT WEIGHTS
 Local compatibility requires adjacent faces to have matching port kinds, including

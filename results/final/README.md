@@ -9,16 +9,21 @@ The building has ten slides and nine stairs. The
 shows the inherited directed graph and the accepted trajectories using the
 same axes and camera. It is rendered directly from the accepted JSON.
 
-`algorithm/wfc_decisions.gif` and `algorithm/wfc_decisions.txt` show the
-same accepted execution for slide `(0, 4, 3) -> (0, 0, 0)`: 21 choices,
-18 non-forced, with no backtracking. The GIF shows the recorded
-post-propagation states, and the text records candidates and probabilities.
-This is not the old DFS-guided demonstration.
-The [explained decision trace](algorithm/wfc_decisions_explained.txt) shows
-the full-precision costs, normalization and reconstructed random draw for
-each corresponding frame. It was generated from a replay whose building,
-GIF and original text matched the accepted artifacts; no solver instrumentation
-or changes to the solver were needed.
+The [decision trace](algorithm/wfc_decisions.txt) records the same accepted
+execution for slide `(0, 4, 3) -> (0, 0, 0)`: 21 choices, 18 non-forced,
+with no backtracking. The
+[explained decision trace](algorithm/wfc_decisions_explained.txt) gives the
+full-precision costs, normalization and reconstructed random draw for each
+choice. No animated GIF is included in the final package; the building PNG
+shows the accepted result, while these text traces document
+how the slide was generated. The traces were generated from a replay whose
+building and original text matched the accepted artifacts; no solver
+instrumentation or changes to the solver were needed.
+
+The earlier DFS baseline coordinates are retained at
+[`baseline/building_seed10_res3.json`](baseline/building_seed10_res3.json).
+They describe a superseded five-floor, 5-by-5 building and are not the
+authoritative hybrid result.
 
 ## Settings and findings
 
@@ -59,7 +64,7 @@ $env:PYTHONHASHSEED = "0"
 $env:MPLBACKEND = "Agg"
 python -m examples.hybrid_building_visualize results\final\building\building_seed10_hybrid.json --output results\hybrid_figure_reproduced.png
 python -m examples.hybrid_experiment --strategy hybrid --weighting compact --relative-budget --minimum-clearance 0.25 --routing-seed 10 --max-seconds 60 --max-backtracks 8 --route-attempts 3 --geometry-preference 1.5 --geometry-backtracking --trace-states --trace-route-id '0:(0, 4, 3)->(0, 0, 0):slide' --output results\hybrid_reproduced.json --building-output results\hybrid_building_reproduced.json
-python -m examples.hybrid_length_visualize results\hybrid_reproduced.json --reference-building results\final\building\building_seed10_hybrid.json --route-id '0:(0, 4, 3)->(0, 0, 0):slide' --output results\hybrid_reproduced_slide
+python -m examples.hybrid_length_trace results\hybrid_reproduced.json --reference-building results\final\building\building_seed10_hybrid.json --route-id '0:(0, 4, 3)->(0, 0, 0):slide' --output results\hybrid_reproduced_slide
 python -m examples.explain_hybrid_decisions results\hybrid_reproduced.json --events results\hybrid_reproduced.events.jsonl --replay-visualization results\hybrid_reproduced_slide --output results\hybrid_decisions_explained_reproduced.txt
 Get-FileHash results\hybrid_building_reproduced.json -Algorithm SHA256
 ```
@@ -71,7 +76,7 @@ The original untraced run used a 10-second per-solve limit; snapshot
 recording required a 60-second limit. Timing can affect retries. The
 `--reference-building` check prevents presenting a trace of different
 geometry as the accepted execution. The explanation tool additionally requires
-byte-identical regenerated GIF and text, verifies the route seed and
+byte-identical regenerated decision text, verifies the route seed and
 reconstructs every candidate's weight, probability and sampled choice.
 Reproduction may not match the saved JSON or presentation bytes if
 timing changes retries; the saved JSON remains authoritative.

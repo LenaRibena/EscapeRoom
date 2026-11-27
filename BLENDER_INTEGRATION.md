@@ -25,7 +25,7 @@ It uses the exact upstream graph generation behavior, requested and accepted
 seed 10, four floors, a 10-by-10 footprint, and WFC grid resolution 3. It
 contains 19 accepted inter-floor routes: 10 slides and 9 stairs.
 
-The older [`results/final_buildings/building_seed10_res3.json`](results/final_buildings/building_seed10_res3.json)
+The older [`results/final/baseline/building_seed10_res3.json`](results/final/baseline/building_seed10_res3.json)
 is retained because it was referenced by the previous Blender handoff. It is
 the superseded five-floor, 5-by-5 building, not the current presentation input.
 Do not overwrite a teammate's existing Blender input without coordination.
@@ -69,7 +69,7 @@ python -m examples.export_building_json results\building_reproduced.json --seed 
 The command above reproduces the DFS baseline; hybrid reproduction is documented
 in [`results/final/README.md`](results/final/README.md). Only the
 hybrid JSON is needed as input to the existing external importer; the PNG,
-GIF, trace and manifest are presentation and provenance files. No Blender
+text traces and manifest are presentation and provenance files. No Blender
 importer or scene is in this worktree, so an actual import and physical mesh
 clearance remain to be checked in the teammate's Blender project. Do not
 overwrite their existing input or scene without coordination.

@@ -8,10 +8,9 @@ from unittest.mock import patch
 
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
 
 from examples.hybrid_building_visualize import create_figure
-from examples.hybrid_length_visualize import main as visualize_decisions
+from examples.hybrid_length_trace import main as write_decision_trace
 from examples.explain_hybrid_decisions import score, turn_description
 
 
@@ -43,8 +42,7 @@ class FinalResultsTests(unittest.TestCase):
         self.assertEqual(len(counts), 21)
         self.assertEqual(sum(count > 1 for count in counts), 18)
         self.assertIn("Backtracks in this accepted execution: 0.", text)
-        with Image.open(FINAL / "algorithm" / "wfc_decisions.gif") as image:
-            self.assertEqual(image.n_frames, len(counts))
+        self.assertFalse((FINAL / "algorithm" / "wfc_decisions.gif").exists())
 
     def test_explained_trace_covers_each_choice(self):
         explained = (FINAL / "algorithm" / "wfc_decisions_explained.txt").read_text(
@@ -92,18 +90,18 @@ class FinalResultsTests(unittest.TestCase):
         finally:
             plt.close(figure)
 
-    def test_visualizer_rejects_different_reference_building(self):
+    def test_trace_writer_rejects_different_reference_building(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             record = root / "record.json"
             reference = root / "reference.json"
             record.write_text(json.dumps({"building": {"id": 1}}), encoding="utf-8")
             reference.write_text(json.dumps({"id": 2}), encoding="utf-8")
-            argv = ["visualize", str(record), "--output", str(root / "output"),
+            argv = ["trace", str(record), "--output", str(root / "output"),
                     "--reference-building", str(reference)]
             with patch("sys.argv", argv):
                 with self.assertRaisesRegex(ValueError, "does not match"):
-                    visualize_decisions()
+                    write_decision_trace()
             self.assertFalse((root / "output").exists())
 
 
