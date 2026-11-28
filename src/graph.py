@@ -47,10 +47,10 @@ class Building(object):
                                             targets=self.path, 
                                             path=np.empty((0, 3), dtype = int), 
                                             visited=set(), 
-                                            p_intra=self.p_intra_sol,
-                                            p_inter=self.p_inter_sol,
+                                            p_intra=self.p_intra_sol if not graph.nodes[start]["type"].endswith("tail") else 1,
+                                            p_inter=self.p_inter_sol if not graph.nodes[start]["type"].endswith("tail") else 0,
                                             min_edges=1,
-                                            max_edges=self.max_edges) # TODO: Consider edge range according to difficulty
+                                            max_edges=3)
                     path = list(map(tuple, path.tolist()))
                     self.graph = self.update_graph(graph=graph, path=path)
                     
@@ -70,22 +70,23 @@ class Building(object):
             print("Level created")
 
     def configure_difficulty(self, difficulty: int) -> None:
-        self.floors = 4
-        self.width = 10
-        self.length = 10
-        volume = self.length * self.width * self.floors # TODO: Length, width and floors could be adjusted by difficulty
+        min_area = 3
+        self.floors = np.random.randint(max(2, difficulty-3), difficulty + 2)
+        self.width = np.random.randint(max(min_area, difficulty-3), difficulty + min_area)
+        self.length = np.random.randint(max(min_area, difficulty-3), difficulty + min_area)
+        volume = self.length * self.width * self.floors
 
-        # TODO: According to Dimitra, the floors should by square
-        self.min_edges = 5 * difficulty
-        self.max_edges = self.min_edges + 10
-        self.non_solution_edges = 100
+        self.min_edges = int(np.ceil(volume * 0.1))
+        self.max_edges = int(np.ceil(volume * 0.2))
+        self.non_solution_edges = int(np.ceil(volume * (0.15 * difficulty)))
         self.p_intra_sol = 0.9
         self.p_inter_sol = 0.1
         self.p_intra_pop = 0.99
         self.p_inter_pop = 0.01
-        self.k = 1
+        self.alpha = difficulty
+        self.beta = 0.8
         self.std = 1
-        self.allow_dead_ends = False
+        self.allow_dead_ends = difficulty > 5
         
         return
     
@@ -103,7 +104,7 @@ class Building(object):
     def gaussian_weight(u: tuple[int], v: tuple[int], std: float = 1.0) -> float:
         return np.exp(-1/2 * np.linalg.norm(u - v, axis = 1)**2 / std**2)
     
-    def node_weight(self, target_nodes: list[tuple[int]], k: float = 1) -> float:
+    def node_weight(self, target_nodes: list[tuple[int]], alpha: float, beta: float) -> float:
         """Returns the weight for a source node given by 
         the gamma function where the input is the shortest
         path length from the closest node in the solution path
@@ -122,8 +123,8 @@ class Building(object):
             all_distances.append(distance)
         all_distances = np.asarray(all_distances)
         
-        # Compute weights by the gamma function # TODO: Reconsider weight function choice (not the real gamma one)
-        return 1 + all_distances * np.exp(-k*np.asarray(all_distances))
+        # Compute weights by the gamma function
+        return 1e-5 + gamma.pdf(all_distances, alpha, scale=1/beta)
         
     
     def generate_path(self,
@@ -196,9 +197,8 @@ class Building(object):
             valid = path[i][-1] == path[i + 1][-1]
             if not valid:
                 all_valid_nodes.remove(path[i])
-        all_weights = self.node_weight(all_valid_nodes, k=self.k)
+        all_weights = self.node_weight(all_valid_nodes, alpha=self.alpha, beta=self.beta)
         
-        # TODO: Check that the weights make sense
         for _ in range(non_solution_edges):
             if not all_valid_nodes:
                 break
@@ -242,7 +242,7 @@ class Building(object):
                 )
                   
                 all_valid_nodes.append(new_node)
-                all_weights = np.append(all_weights, self.node_weight([new_node], k=self.k))
+                all_weights = np.append(all_weights, self.node_weight([new_node], alpha=self.alpha, beta=self.beta))
                 
                 # If we made a stair/slide, it's no longer valid
                 if c == "inter":
@@ -431,11 +431,16 @@ class Building(object):
         ax.set_zlabel('Z')
 
         ax.set_box_aspect([1, 1, 1])
+        ax.set_title(f"Dimensions: {self.length}x{self.width}x{self.floors}\n \
+                        solution path length: {len(self.path)} \n \
+                        number of off-road edges: {self.non_solution_edges} \n \
+                        allow dead ends: {self.allow_dead_ends}")
 
         plt.show()
 
 if __name__ == "__main__":
-    diff = 2
+    diff = 7
+    # np.random.seed(2)
     building = Building(difficulty=diff, verbose = True)
     
     # TODO: Quantitatively evaluate e.g
